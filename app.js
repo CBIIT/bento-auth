@@ -3,14 +3,18 @@ var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
+var session = require('express-session');
 var logger = require('morgan');
 const fs = require('fs');
 const cors = require('cors');
+const config = require('./config');
+console.log(config);
 
 const LOG_FOLDER = 'logs';
 if (!fs.existsSync(LOG_FOLDER)) {
   fs.mkdirSync(LOG_FOLDER);
 }
+
 
 // create a write stream (in append mode)
 const accessLogStream = fs.createWriteStream(path.join(__dirname, LOG_FOLDER, 'access.log'), { flags: 'a'})
@@ -25,7 +29,8 @@ app.use(logger('combined', { stream: accessLogStream }))
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-app.use(cookieParser());
+app.use(cookieParser(config.cookie_secret));
+app.use(session({secret: config.cookie_secret}));
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/api/auth', authRouter);

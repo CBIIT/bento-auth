@@ -1,23 +1,48 @@
 const { google } = require('googleapis');
-
-const client_id = process.env['CLIENT_ID']
-const client_secret = process.env['CLIENT_SECRET']
-const redirect_url = process.env['REDIRECT_URL']
+const config = require('../config');
 
 
-let client = {
+const oauth2Client = new google.auth.OAuth2(
+    config.client_id,
+    config.client_secret,
+    config.redirect_url
+);
+
+ let client = {
     login: async (code) => {
         try {
-            const oauth2Client = new google.auth.OAuth2(
-                client_id,
-                client_secret,
-                redirect_url
-            );
 
             const {tokens} = await oauth2Client.getToken(code)
-            return tokens;
+            const ticket = await oauth2Client.verifyIdToken({
+                idToken: tokens.id_token,
+                audience: config.client_id
+            });
+            const payload = ticket.getPayload();
+            const name = payload.name;
+
+            return { name, tokens };
         } catch (e) {
             console.log(e);
+            return null;
+        }
+    },
+    authenticated: async (tokens) => {
+        try {
+            if (tokens) {
+                const ticket = await oauth2Client.verifyIdToken({
+                    idToken: tokens.id_token,
+                    audience: config.client_id
+                });
+                const payload = ticket.getPayload();
+                return true;
+            } else {
+                console.log('No tokens found!');
+                return false;
+            }
+
+        } catch (e) {
+           console.log(e);
+           return false;
         }
     }
 }
