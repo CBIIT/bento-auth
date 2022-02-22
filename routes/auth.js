@@ -39,14 +39,11 @@ router.post('/logout', async function(req, res, next) {
 
 /* Authenticated */
 // Return {status: true} or {status: false}
+// Calling this API will refresh the session
 router.post('/authenticated', async function(req, res, next) {
   try {
     if (req.session.tokens) {
-      if (await idpClient.authenticated(req.session.tokens)) {
-        return res.status(200).send({status: true});
-      } else {
-        return res.status(200).send({status: false});
-      }
+      return res.status(200).send({status: true});
     } else {
       return res.status(200).send({status: false});
     }

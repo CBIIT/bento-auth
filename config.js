@@ -6,7 +6,8 @@ const config = {
   client_id: process.env.CLIENT_ID,
   client_secret: process.env.CLIENT_SECRET,
   redirect_url: process.env.REDIRECT_URL,
-  cookie_secret: process.env.COOKIE_SECRET
+  cookie_secret: process.env.COOKIE_SECRET,
+  session_timeout: 30 * 60 * 1000 // 30 minutes
 };
 
 if (!config.version) {

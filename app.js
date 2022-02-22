@@ -30,7 +30,13 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 app.use(cookieParser(config.cookie_secret));
-app.use(session({secret: config.cookie_secret}));
+app.use(session({
+  secret: config.cookie_secret,
+  rolling: true,
+  cookie: {
+    // Session expires after 1 min of inactivity.
+    expires: config.session_timeout
+  }}));
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/api/auth', authRouter);
