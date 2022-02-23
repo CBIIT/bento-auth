@@ -20,7 +20,7 @@ router.post('/login', async function(req, res, next) {
 /* Logout */
 router.post('/logout', async function(req, res, next) {
   try {
-    if (req.session.tokens) {
+    if (req.session) {
       req.session.destroy( (err) => {
         if (err) {
           console.log(err);
