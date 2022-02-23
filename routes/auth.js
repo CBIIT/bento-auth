@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const idpClient = require('../idps');
 const config = require('../config');
-
+const axios = require('axios');
 
 /* Login */
 router.post('/login', async function(req, res, next) {
@@ -56,6 +56,26 @@ router.post('/authenticated', async function(req, res, next) {
   } catch (e) {
     console.log(e);
     res.status(500).json({errors: e});
+  }
+});
+
+/* Temporary redirect file download request to avoid CORS issue */
+router.get('/files/:fileId', async function(req, res, next) {
+  try {
+    const fileId = req.params.fileId;
+    const result = await axios.get('http://localhost:4000/api/files/' + fileId, {
+      headers: {
+        Cookie: req.headers.cookie
+      }
+    });
+    res.json(result.data);
+  } catch (e) {
+    console.log(e);
+    if (e.response) {
+      return res.status(e.response.status).send();
+    } else {
+      res.status(500).send();
+    }
   }
 });
 
