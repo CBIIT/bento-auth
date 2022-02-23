@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const idpClient = require('../idps/google');
+const idpClient = require('../idps');
 const config = require('../config');
 
 
