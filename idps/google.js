@@ -10,21 +10,15 @@ const oauth2Client = new google.auth.OAuth2(
 
  let client = {
     login: async (code) => {
-        try {
+        const {tokens} = await oauth2Client.getToken(code)
+        const ticket = await oauth2Client.verifyIdToken({
+            idToken: tokens.id_token,
+            audience: config.client_id
+        });
+        const payload = ticket.getPayload();
+        const name = payload.name;
 
-            const {tokens} = await oauth2Client.getToken(code)
-            const ticket = await oauth2Client.verifyIdToken({
-                idToken: tokens.id_token,
-                audience: config.client_id
-            });
-            const payload = ticket.getPayload();
-            const name = payload.name;
-
-            return { name, tokens };
-        } catch (e) {
-            console.log(e);
-            return null;
-        }
+        return { name, tokens };
     },
     authenticated: async (tokens) => {
         try {

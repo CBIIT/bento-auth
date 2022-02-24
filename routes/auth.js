@@ -13,7 +13,13 @@ router.post('/login', async function(req, res, next) {
     res.json({ name });
   } catch (e) {
     console.log(e);
-    res.status(500).json({error: e});
+    if (e.code) {
+      res.status(e.code);
+    } else {
+      res.status(500);
+    }
+
+    res.json({error: e.message});
   }
 });
 
