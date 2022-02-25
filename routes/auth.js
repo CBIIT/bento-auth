@@ -72,7 +72,7 @@ router.get('/files/:fileId', async function(req, res, next) {
   } catch (e) {
     console.log(e);
     if (e.response) {
-      return res.status(e.response.status).send();
+      return res.status(e.response.status).send(e.response.data);
     } else {
       res.status(500).send();
     }
