@@ -8,7 +8,7 @@ const config = {
   client_secret: process.env.CLIENT_SECRET,
   redirect_url: process.env.REDIRECT_URL,
   cookie_secret: process.env.COOKIE_SECRET,
-  session_timeout: 30 * 60 * 1000 // 30 minutes
+  session_timeout: process.env.SESSION_TIMEOUT ? parseInt(process.env.SESSION_TIMEOUT) : 30 * 60 * 1000 // 30 minutes
 };
 
 if (!config.version) {
