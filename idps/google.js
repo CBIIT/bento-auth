@@ -16,7 +16,7 @@ const oauth2Client = new google.auth.OAuth2(
             audience: config.client_id
         });
         const payload = ticket.getPayload();
-        const name = payload.name;
+        const name = payload.given_name;
 
         return { name, tokens };
     },
