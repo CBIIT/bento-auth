@@ -34,8 +34,7 @@ app.use(session({
   secret: config.cookie_secret,
   rolling: true,
   cookie: {
-    // Session expires after 1 min of inactivity.
-    expires: config.session_timeout
+    expires: config.session_timeout * 1000
   }}));
 app.use(express.static(path.join(__dirname, 'public')));
 
