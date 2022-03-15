@@ -2,8 +2,8 @@ const newrelic = require('newrelic');
 var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
-var cookieParser = require('cookie-parser');
 var session = require('express-session');
+var FileStore = require('session-file-store')(session);
 var logger = require('morgan');
 const fs = require('fs');
 const cors = require('cors');
@@ -29,13 +29,18 @@ app.use(logger('combined', { stream: accessLogStream }))
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-app.use(cookieParser(config.cookie_secret));
+
+var fileStoreOptions = {};
+
 app.use(session({
   secret: config.cookie_secret,
   rolling: true,
+  store: new FileStore(fileStoreOptions),
   cookie: {
     expires: config.session_timeout * 1000
-  }}));
+  }
+}));
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/api/auth', authRouter);
