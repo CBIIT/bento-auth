@@ -30,15 +30,12 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 
-var fileStoreOptions = {};
+var fileStoreOptions = {ttl: config.session_timeout, reapInterval: 10};
 
 app.use(session({
   secret: config.cookie_secret,
   rolling: true,
   store: new FileStore(fileStoreOptions),
-  cookie: {
-    expires: config.session_timeout * 1000
-  }
 }));
 
 app.use(express.static(path.join(__dirname, 'public')));
