@@ -1,0 +1,36 @@
+type User {
+    firstName: String
+    lastName: String
+    email: String
+    IDP: String
+    organization: String
+    userID: ID
+    registrationDate: String
+    approvalDate: String
+    editDate: String
+    role: String
+    status: String
+}
+
+input UserInput {
+    firstName: String
+    lastName: String
+    email: String
+    IDP: String
+    organization: String
+}
+
+type Query {
+    listUsers: [User]
+    getMyUser : User
+}
+
+type Mutation {
+    registerUser (userInfo: UserInput!): User
+    updateMyUser (userInfo: UserInput!): User
+    approveUser (userID: ID!, role: String): User
+    rejectUser (userID: ID!, comment: String): User
+    deleteUser (userID: ID!): User
+    disableUser (userID: ID!): User
+    editUser(userID: ID!, role: String, status: String, organization: String): User
+}
