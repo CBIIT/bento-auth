@@ -1,23 +1,28 @@
 const express = require('express');
 const {graphqlHTTP} = require('express-graphql');
 const {buildSchema} = require('graphql');
-const db = require('./data-operations');
-const auth = require('./auth');
-const {authorize, authorizeAdmin} = require('./permissions')
+const db = require('./database/data-interface');
+const auth = require('./authentication/auth');
+const {authorize, authorizeAdmin} = require('./authorization/permissions')
+const {error} = require("neo4j-driver");
 
 
-const currentUser = auth.getCurrentUser();
+const currentUserEmail = auth.getCurrentUser();
 
 //Read schema from schema.graphql file
-const schema = buildSchema(require("fs").readFileSync("schema.graphql", "utf8"));
+const schema = buildSchema(require("fs").readFileSync("graphql/schema.graphql", "utf8"));
 
 //Query logic
 const root = {
     getMyUser: () => {
-        if (authorize(currentUser)){
-            return db.getMyUser(currentUser)
-        }
+        return db.getMyUser(currentUserEmail)
     },
+    listUsers: () => {
+        return db.listUsers(currentUserEmail)
+    },
+    registerUser: (args) => {
+        return db.registerUser(args)
+    }
 };
 
 const app = express();
