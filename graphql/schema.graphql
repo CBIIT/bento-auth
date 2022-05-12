@@ -22,7 +22,7 @@ input UserInput {
 
 type Query {
     listUsers: [User]
-    getMyUser : User
+    getMyUser: User
 }
 
 type Mutation {

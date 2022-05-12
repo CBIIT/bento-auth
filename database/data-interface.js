@@ -15,7 +15,7 @@ function getMyUser(email) {
 
 function listUsers(email) {
     return db
-        .listUsers(email)
+        .listUsers()
         .then(result => {
             const response = []
             for (const user of result){
