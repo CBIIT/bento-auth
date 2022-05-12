@@ -9,14 +9,13 @@ const users = data['users']
 
 wipeDatabase()
 loadTestData(users)
+process.exit(0)
 
 function wipeDatabase() {
     if (process.env.TEST_LOADING_MODE === "overwrite"){
         console.log("Wiping database");
         executeQuery({}, `MATCH (n) OPTIONAL MATCH (n)-[r]-() DELETE r,n`, {})
-            .then(() => {
-                return
-            })
+        return
     }
     else{
         return

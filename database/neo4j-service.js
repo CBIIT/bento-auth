@@ -10,10 +10,13 @@ function getMyUser(parameters) {
     const cypher =
     `
         MATCH (user:User)
-        WHERE user.email = email
+        WHERE user.email = $email
         return user
     `
     return executeQuery(parameters, cypher, 'user')
+        .then(result => {
+            return result[0].properties
+        })
 }
 
 function listUsers() {
@@ -22,7 +25,12 @@ function listUsers() {
         MATCH (user:User)
         return user 
     `
+    const users = []
     return executeQuery({}, cypher, 'user')
+        .then(result => {
+            result.forEach(x => {users.push(x.properties)})
+            return users
+        })
 }
 
 //Mutations
@@ -42,6 +50,9 @@ function registerUser(parameters) {
         RETURN user
     `
     return executeQuery(parameters, cypher, 'user')
+        .then(result => {
+            return result[0].properties
+        })
 }
 
 function updateMyUser(parameters) {
@@ -59,6 +70,9 @@ function updateMyUser(parameters) {
         RETURN user
     `
     return executeQuery(parameters, cypher, 'user')
+        .then(result => {
+            return result[0].properties
+        })
 }
 
 function reviewUser(parameters) {
@@ -73,6 +87,9 @@ function reviewUser(parameters) {
         RETURN user
     `
     return executeQuery(parameters, cypher, 'user')
+        .then(result => {
+            return result[0].properties
+        })
 }
 
 function deleteUser(parameters) {
@@ -85,6 +102,9 @@ function deleteUser(parameters) {
         RETURN user
     `
     return executeQuery(parameters, cypher, 'user')
+        .then(result => {
+            return result[0].properties
+        })
 }
 
 function disableUser(parameters) {
@@ -97,6 +117,9 @@ function disableUser(parameters) {
         RETURN user
     `
     return executeQuery(parameters, cypher, 'user')
+        .then(result => {
+            return result[0].properties
+        })
 }
 
 function editUser(parameters) {
@@ -112,6 +135,9 @@ function editUser(parameters) {
         RETURN user
     `
     return executeQuery(parameters, cypher, 'user')
+        .then(result => {
+            return result[0].properties
+        })
 }
 
 function executeQuery(parameters, cypher, returnLabel) {
