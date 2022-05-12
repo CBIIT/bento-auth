@@ -2,10 +2,6 @@ const express = require('express');
 const {graphqlHTTP} = require('express-graphql');
 const {buildSchema} = require('graphql');
 const db = require('./database/data-interface');
-const {getCurrentUser} = require('./authentication/auth');
-
-
-const currentUserEmail = getCurrentUser();
 
 //Read schema from schema.graphql file
 const schema = buildSchema(require("fs").readFileSync("graphql/schema.graphql", "utf8"));
@@ -13,10 +9,10 @@ const schema = buildSchema(require("fs").readFileSync("graphql/schema.graphql", 
 //Query logic
 const root = {
     getMyUser: () => {
-        return db.getMyUser(currentUserEmail)
+        return db.getMyUser()
     },
     listUsers: () => {
-        return db.listUsers(currentUserEmail)
+        return db.listUsers()
     },
     registerUser: (args) => {
         return db.registerUser(args)

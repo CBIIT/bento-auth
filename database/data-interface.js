@@ -1,13 +1,23 @@
 const {v4} = require('uuid')
 const neo4j = require('./neo4j-service')
+const {getCurrentUser} = require("../authentication/authentication")
+const {getPermissionLevel} = require('../authorization/authorization')
 
-function getMyUser(email) {
-    const parameters = {email: email}
+function getMyUser() {
+    const parameters = getCurrentUser()
     return neo4j.getMyUser(parameters)
 }
 
-function listUsers(email) {
-    return neo4j.listUsers()
+function listUsers() {
+    return getMyUser()
+        .then(userInfo => {
+            if (getPermissionLevel(userInfo) != 'none'){
+                return neo4j.listUsers()
+            }
+            else{
+                return new Error("Not Authorized")
+            }
+        })
 }
 
 function registerUser(args) {
@@ -24,33 +34,67 @@ function updateMyUser(args) {
 }
 
 function approveUser(args) {
-    const parameters = args
-    parameters['status'] = "approved"
-    parameters['approvalDate'] = (new Date()).toString()
-    return neo4j.reviewUser(parameters)
+    args['status'] = "approved"
+    return reviewUser(args)
 }
 
 function rejectUser(args) {
+    args['status'] = "rejected"
+    return reviewUser(args)
+}
+
+function reviewUser(args) {
     const parameters = args
-    parameters['status'] = "rejected"
     parameters['approvalDate'] = (new Date()).toString()
-    return neo4j.reviewUser(parameters)
+    return getMyUser()
+        .then(userInfo => {
+            if (getPermissionLevel(userInfo) === 'admin'){
+                return neo4j.reviewUser(parameters)
+            }
+            else{
+                return new Error("Not Authorized")
+            }
+        })
 }
 
 function deleteUser(args) {
     const parameters = args
-    return neo4j.deleteUser(parameters)
+    return getMyUser()
+        .then(userInfo => {
+            if (getPermissionLevel(userInfo) === 'admin'){
+                return neo4j.deleteUser(parameters)
+            }
+            else{
+                return new Error("Not Authorized")
+            }
+        })
 }
 
 function disableUser(args) {
     const parameters = args
-    return neo4j.disableUser(parameters)
+    return getMyUser()
+        .then(userInfo => {
+            if (getPermissionLevel(userInfo) === 'admin'){
+                return neo4j.disableUser(parameters)
+            }
+            else{
+                return new Error("Not Authorized")
+            }
+        })
 }
 
 function editUser(args) {
     const parameters = args
     parameters['editDate'] = (new Date()).toString()
-    return neo4j.editUser(parameters)
+    return getMyUser()
+        .then(userInfo => {
+            if (getPermissionLevel(userInfo) === 'admin'){
+                return neo4j.editUser(parameters)
+            }
+            else{
+                return new Error("Not Authorized")
+            }
+        })
 }
 
 exports.getMyUser = getMyUser
