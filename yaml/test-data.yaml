@@ -1,0 +1,21 @@
+users:
+  - firstName: adminFirst
+    lastName: adminLast
+    email: admin@test.com
+    IDP: adminIDP
+    organization: adminOrg
+  - firstName: user1First
+    lastName: user1Last
+    email: user1@test.com
+    IDP: userIDP
+    organization: userOrg
+  - firstName: user2First
+    lastName: user2Last
+    email: user2@test.com
+    IDP: userIDP
+    organization: userOrg
+  - firstName: user3First
+    lastName: user3Last
+    email: user3@test.com
+    IDP: userIDP
+    organization: userOrg

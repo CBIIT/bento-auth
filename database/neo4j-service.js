@@ -140,3 +140,4 @@ exports.reviewUser = reviewUser
 exports.deleteUser = deleteUser
 exports.disableUser = disableUser
 exports.editUser = editUser
+exports.executeQuery = executeQuery
