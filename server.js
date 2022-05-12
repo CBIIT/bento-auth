@@ -3,7 +3,6 @@ const {graphqlHTTP} = require('express-graphql');
 const {buildSchema} = require('graphql');
 const db = require('./database/data-interface');
 const {getCurrentUser} = require('./authentication/auth');
-const {authorize, authorizeAdmin} = require('./authorization/permissions')
 
 
 const currentUserEmail = getCurrentUser();
