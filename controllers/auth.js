@@ -27,7 +27,7 @@ exports.logout = async (req, res, next) => {
                     console.log(err);
                     return res.status(500).send({errors: err});
                 }
-                res.status(200).send({status: 'success'});
+                return res.status(200).send({status: 'success'});
             });
         }
         return res.status(200).send({status: 'success'});
@@ -47,7 +47,7 @@ exports.authenticated = async (req, res, next) => {
         }
     } catch (e) {
         console.log(e);
-        res.status(500).json({errors: e});
+        res.status(500).send({errors: e});
     }
 }
 
