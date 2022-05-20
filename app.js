@@ -19,7 +19,7 @@ if (!fs.existsSync(LOG_FOLDER)) {
 // create a write stream (in append mode)
 const accessLogStream = fs.createWriteStream(path.join(__dirname, LOG_FOLDER, 'access.log'), { flags: 'a'})
 
-var authRouter = require('./routes/auth');
+var authRouter = require('./routes/login');
 
 var app = express();
 app.use(cors());

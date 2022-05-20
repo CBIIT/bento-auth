@@ -6,7 +6,6 @@ const { login, logout, ping, version, authenticated } = require('../controllers/
 router.post('/login', login);
 /* Logout */
 router.post('/logout', logout);
-
 /* Authenticated */
 // Return {status: true} or {status: false}
 // Calling this API will refresh the session

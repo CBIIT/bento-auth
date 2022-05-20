@@ -6,6 +6,7 @@ exports.login = async (req, res, next) => {
         const code = req.body['code'];
         const { name, tokens } = await idpClient.login(code);
         req.session.tokens = tokens;
+        res.status(200);
         res.json({ name });
     } catch (e) {
         console.log(e);

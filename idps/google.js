@@ -1,33 +1,16 @@
-const { google } = require('googleapis');
-const config = require('../config');
+const {getToken, verifyIdToken} = require("./google-oauth2-tokens");
 
-
-const oauth2Client = new google.auth.OAuth2(
-    config.client_id,
-    config.client_secret,
-    config.redirect_url
-);
-
- let client = {
+let client = {
     login: async (code) => {
-        const {tokens} = await oauth2Client.getToken(code)
-        const ticket = await oauth2Client.verifyIdToken({
-            idToken: tokens.id_token,
-            audience: config.client_id
-        });
-        const payload = ticket.getPayload();
+        const tokens = await getToken(code);
+        const payload = await verifyIdToken(tokens);
         const name = payload.given_name;
-
         return { name, tokens };
     },
     authenticated: async (tokens) => {
         try {
             if (tokens) {
-                const ticket = await oauth2Client.verifyIdToken({
-                    idToken: tokens.id_token,
-                    audience: config.client_id
-                });
-                const payload = ticket.getPayload();
+                const payload = await verifyIdToken(tokens);
                 return true;
             } else {
                 console.log('No tokens found!');
