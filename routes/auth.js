@@ -2,14 +2,16 @@ const express = require('express');
 const router = express.Router();
 const idpClient = require('../idps');
 const config = require('../config');
+const {getUserSessionData} = require("../data-management/data-interface");
 
 
 /* Login */
 router.post('/login', async function(req, res, next) {
   try {
     const code = req.body['code'];
-    const { name, tokens } = await idpClient.login(code);
+    const { name, tokens, email } = await idpClient.login(code);
     req.session.tokens = tokens;
+    await getUserSessionData(req.session, email)
     res.json({ name });
   } catch (e) {
     console.log(e);
