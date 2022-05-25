@@ -8,7 +8,9 @@ const config = {
   client_secret: process.env.CLIENT_SECRET,
   redirect_url: process.env.REDIRECT_URL,
   cookie_secret: process.env.COOKIE_SECRET,
-  session_timeout: process.env.SESSION_TIMEOUT ? parseInt(process.env.SESSION_TIMEOUT) : 30 * 60  // 30 minutes
+  session_timeout: process.env.SESSION_TIMEOUT ? parseInt(process.env.SESSION_TIMEOUT) : 30 * 60,
+  nih: JSON.parse(process.env.NIH_LOGIN),
+  login_gov: JSON.parse(process.env.LOGIN_GOV)
 };
 
 if (!config.version) {

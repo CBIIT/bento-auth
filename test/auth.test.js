@@ -1,6 +1,6 @@
-const {ping, version, logout, authenticated} = require('../controllers/auth')
+const {ping, version, logout, authenticated } = require('../controllers/auth')
 const {login} = require("../idps/google");
-
+const config = require('../config');
 jest.mock("../idps/google-oauth2-tokens");
 const {getToken, verifyIdToken} = require("../idps/google-oauth2-tokens");
 
@@ -103,4 +103,12 @@ describe('Connection Test', () => {
         expect(res.json).toBeCalledWith({version: "1.0", date:"2022.05.19"});
     });
 });
+
+describe('Authentication Property Read TEST', () => {
+    test('/null check', async () => {
+        expect(config.nih).not.toBeNull();
+        expect(config.login_gov).not.toBeNull();
+    });
+});
+
 
