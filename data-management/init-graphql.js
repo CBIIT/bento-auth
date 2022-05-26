@@ -18,11 +18,13 @@ const root = {
     editUser: data_interface.editUser,
 };
 
-module.exports = graphqlHTTP((req) => ({
-    graphiql: true,
-    schema: schema,
-    rootValue: root,
-    context: {
-        session: req.session
-    },
-}));
+module.exports = graphqlHTTP((req, res, params) => {
+    return {
+        graphiql: true,
+        schema: schema,
+        rootValue: root,
+        context: {
+            session: req.session
+        },
+    }
+});

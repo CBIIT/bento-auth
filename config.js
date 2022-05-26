@@ -16,7 +16,9 @@ const config = {
   NEO4J_PASSWORD: process.env.NEO4J_PASSWORD,
   //Initial database loading
   DATA_LOADING_MODE: process.env.DATA_LOADING_MODE,
-  DATA_FILE: process.env.DATA_FILE
+  DATA_FILE: process.env.DATA_FILE,
+  //Testing
+  TEST_EMAIL: process.env.TEST_EMAIL,
 };
 
 if (!config.version) {

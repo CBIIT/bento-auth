@@ -4,6 +4,7 @@ type User {
     email: String
     IDP: String
     organization: String
+    acl: [String]
     userID: ID
     registrationDate: String
     approvalDate: String
@@ -18,6 +19,7 @@ input UserInput {
     email: String
     IDP: String
     organization: String
+    acl: [String]
 }
 
 type Query {

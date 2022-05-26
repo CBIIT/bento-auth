@@ -1,16 +1,21 @@
 const {v4} = require('uuid')
 const neo4j = require('./neo4j-service')
+const config = require('../config');
 
 // Sets userInfo in the session
 async function getUserSessionData(session, email) {
     session.userInfo = {
-        email: email
+        email: email,
+        idp: config.idp
     }
     let result = await neo4j.getMyUser(session.userInfo);
-    if (result.status === 'approved') {
-        session.userInfo.role = result.role
-    } else {
-        session.userInfo.role = "none"
+    if (result){
+        if (result.status){
+            session.userInfo.status = result.status;
+        }
+        if (result.role){
+            session.userInfo.role = result.role;
+        }
     }
     return
 }
@@ -24,14 +29,14 @@ function checkStandardPermissions(userInfo) {
 }
 
 function checkApproved(userInfo) {
-    return checkForUserInfo(userInfo) && userInfo.status === 'approved';
+    return checkForUserInfo(userInfo) && userInfo.role && userInfo.status === 'approved';
 }
 
 function checkForUserInfo(userInfo) {
-    return userInfo && userInfo.status && userInfo.role
+    return userInfo && userInfo.status;
 }
 
-const getMyUser = async (args, context) => {
+const getMyUser = async (_, context) => {
     try{
         let userInfo = context.session.userInfo;
         if (checkForUserInfo(userInfo)) {
@@ -46,7 +51,7 @@ const getMyUser = async (args, context) => {
     }
 }
 
-const listUsers = (args, context) => {
+const listUsers = (_, context) => {
     try{
         let userInfo = context.session.userInfo;
         if (checkAdminPermissions(userInfo)) {
@@ -61,33 +66,34 @@ const listUsers = (args, context) => {
     }
 }
 
-const registerUser = (newUserInfo, context) => {
-    try{
+const registerUser = (input, context) => {
+    try {
         let generatedInfo = {
+            email: context.session.userInfo.email,
+            idp: context.session.userInfo.idp,
             userID: v4(),
             registrationDate: (new Date()).toString(),
-            status: "registered"
+            status: "registered",
+            role: "standard"
         };
         let registrationInfo = {
-            ...newUserInfo,
+            ...input.userInfo,
             ...generatedInfo
         };
-        return neo4j.registerUser(registrationInfo)
-    }
-    catch(err){
+        let result = neo4j.registerUser(registrationInfo);
+        context.session.userInfo.status = 'registered';
+        return result;
+    } catch (err) {
         return err;
     }
 }
 
-const updateMyUser = (newUserInfo, context) => {
+const updateMyUser = (input, context) => {
     try{
         let userInfo = context.session.userInfo;
-        if (checkApproved(userInfo) && newUserInfo.email && newUserInfo.email === userInfo.email) {
-            return neo4j.updateMyUser(newUserInfo);
-        }
-        else{
-            return new Error("Not Authorized")
-        }
+        input.userInfo.email = userInfo.email;
+        input.userInfo.editDate = (new Date()).toString();
+        return neo4j.updateMyUser(input.userInfo);
     }
     catch (err) {
         return err;

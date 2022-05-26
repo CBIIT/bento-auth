@@ -1,6 +1,6 @@
 const neo4j = require('neo4j-driver');
 const config = require('../config');
-const driver = neo4j.driver(config.NEO4J_URI, neo4j.auth.basic(config.NEO4J_USER, config.NEO4j_PASSWORD));
+const driver = neo4j.driver(config.NEO4J_URI, neo4j.auth.basic(config.NEO4J_USER, config.NEO4J_PASSWORD));
 
 //Queries
 async function getMyUser(parameters) {
@@ -11,7 +11,10 @@ async function getMyUser(parameters) {
         return user
     `
     const result = await executeQuery(parameters, cypher, 'user');
-    return result[0].properties;
+    if (result && result[0]){
+        return result[0].properties;
+    }
+    return;
 }
 
 async function listUsers() {
@@ -34,11 +37,13 @@ async function registerUser(parameters) {
             firstName: $firstName,
             lastName: $lastName,
             email: $email,
-            IDP: $IDP,
+            IDP: $idp,
             organization: $organization,
             userID: $userID,
             registrationDate: $registrationDate,
-            status: $status
+            status: $status,
+            acl: $acl,
+            role: $role
         }) 
         RETURN user
     `
@@ -127,8 +132,8 @@ async function wipeDatabase(){
 
 async function executeQuery(parameters, cypher, returnLabel) {
     const session = driver.session();
+    const tx = session.beginTransaction();
     try{
-        const tx = session.beginTransaction();
         const result = await tx.run(cypher, parameters);
         return result.records.map(record => {
             return record.get(returnLabel)
@@ -138,6 +143,10 @@ async function executeQuery(parameters, cypher, returnLabel) {
         throw error;
     }
     finally{
+        try{
+            await tx.commit();
+        }
+        catch(err){}
         await session.close();
     }
 }
