@@ -1,31 +1,36 @@
-var createError = require('http-errors');
 const express = require('express');
 var path = require('path');
 var session = require('express-session');
 var FileStore = require('session-file-store')(session);
+
+const {errorHandler, throwError, createLogStream} = require("./middleware/error");
+const {importPublicHTML} = require("./view/import-html");
+
 var logger = require('morgan');
 const fs = require('fs');
 const cors = require('cors');
 const config = require('./config');
 console.log(config);
 
-const LOG_FOLDER = 'logs';
-if (!fs.existsSync(LOG_FOLDER)) {
-  fs.mkdirSync(LOG_FOLDER);
-}
-
-// create a write stream (in append mode)
-const accessLogStream = fs.createWriteStream(path.join(__dirname, LOG_FOLDER, 'access.log'), { flags: 'a'})
-
 const app = express();
 app.use(cors());
 
 // Declare All Routes
 const indexRoutes = require('./routes/index');
+
 app.use(indexRoutes);
 
 // setup the logger
+// create a write stream (in append mode)
+// TODO REFACTORING
+const LOG_FOLDER = 'logs';
+if (!fs.existsSync(LOG_FOLDER)) {
+  fs.mkdirSync(LOG_FOLDER);
+}
+const accessLogStream = fs.createWriteStream(path.join(__dirname, LOG_FOLDER, 'access.log'), { flags: 'a'})
 app.use(logger('combined', { stream: accessLogStream }))
+// app.use(createLogStream)
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
@@ -40,27 +45,15 @@ app.use(session({
   store: new FileStore(fileStoreOptions),
 }));
 
-app.use(express.static(path.join(__dirname, 'public')));
-
-
-const passport = require('./lib/passport')(app);
-const authRouter = require('./routes/google-auth')(passport);
-app.use('/api/auth', authRouter);
-
-// catch 404 and forward to error handler
-app.use(function(req, res, next) {
-  next(createError(404));
+app.use(importPublicHTML(express));
+async function activatePassport() {
+  return await require('./lib/passport')(app);
+}
+activatePassport().then((passport) => {
+  const authRouter = require('./routes/google-auth')(passport);
+  app.use('/api/auth', authRouter);
+  // catch 404 and forward to error handler
+  app.use(throwError);
+  app.use(errorHandler);
 });
-
-// error handler
-app.use(function(err, req, res, next) {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
-
-  // render the error page
-  res.status(err.status || 500);
-  res.json(res.locals.message);
-});
-
 module.exports = app;
