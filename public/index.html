@@ -87,7 +87,7 @@
             }
         }
         async function signOut() {
-            const rawResponse = await fetch('/auth/logout/', {
+            const rawResponse = await fetch('/api/auth/logout/', {
                 method: 'GET'
             });
             const content = await rawResponse.json();
@@ -99,7 +99,7 @@
             console.log(content);
         }
         async function authenticated() {
-            const rawResponse = await fetch('/auth/authenticated/', {
+            const rawResponse = await fetch('/api/auth/authenticated/', {
                 method: 'GET'
             });
             const content = await rawResponse.json();

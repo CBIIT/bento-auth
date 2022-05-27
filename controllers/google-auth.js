@@ -1,6 +1,3 @@
-const idpClient = require('../idps');
-const config = require("../config");
-
 exports.login = async (req, res, next) => {
     try {
         const code = req.body['code'];
@@ -19,28 +16,21 @@ exports.login = async (req, res, next) => {
     }
 }
 
-exports.logout = async (req, res, next) => {
-    try {
-        if (req.session) {
-            req.session.destroy( (err) => {
-                if (err) {
-                    console.log(err);
-                    return res.status(500).send({errors: err});
-                }
-                return res.status(200).send({status: 'success'});
-            });
+exports.googleLogout = (request, response, next) => {
+    // request.logout();
+    request.logout(function(err) {
+        if (err) {
+            return next(err);
         }
-        // return res.status(200).send({status: 'success'});
-
-    } catch (e) {
-        console.log(e);
-        res.status(500).json({errors: e});
-    }
+        request.session.destroy();
+        response.send({status: 'success'});
+        // return response.redirect('/');
+    });
 }
 
-exports.authenticated = async (req, res, next) => {
+exports.googleAuthenticated = (req, res) => {
     try {
-        if (req.session.tokens) {
+        if (req.user) {
             return res.status(200).send({status: true});
         } else {
             return res.status(200).send({status: false});
