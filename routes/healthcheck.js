@@ -1,6 +1,6 @@
-const { Router } = require('express');
-const { ping, version } = require('../controllers/auth')
-const router = Router();
+const { ping, version } = require('../controllers/healthcheck')
+var express = require('express');
+var router = express.Router();
 // health-check route
 router.get('/ping', ping);
 router.get('/version', version);

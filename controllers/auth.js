@@ -30,7 +30,7 @@ exports.logout = async (req, res, next) => {
                 return res.status(200).send({status: 'success'});
             });
         }
-        return res.status(200).send({status: 'success'});
+        // return res.status(200).send({status: 'success'});
 
     } catch (e) {
         console.log(e);
@@ -51,13 +51,22 @@ exports.authenticated = async (req, res, next) => {
     }
 }
 
-exports.ping = (req, res, next) => {
-    res.send(`pong`);
+exports.gov_login = async (req, res, next) => {
+    try {
+        // TODO ADD GOV Login
+        return res.status(200).send('<a href="/api/auth/google">login</a>');
+    } catch (e) {
+        console.log(e);
+        res.status(500).send({errors: e});
+    }
 }
 
-exports.version = async (req, res, next) => {
-    res.json({
-        version: config.version,
-        date: config.date
-    });
+exports.nih_login = async (req, res, next) => {
+    try {
+        // TODO ADD NIH Login
+        return res.status(200).send('<a href="/api/auth/google">login</a>');
+    } catch (e) {
+        console.log(e);
+        res.status(500).send({errors: e});
+    }
 }
