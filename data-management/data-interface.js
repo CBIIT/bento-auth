@@ -69,8 +69,6 @@ const listUsers = (_, context) => {
 const registerUser = (input, context) => {
     try {
         let generatedInfo = {
-            email: context.session.userInfo.email,
-            idp: context.session.userInfo.idp,
             userID: v4(),
             registrationDate: (new Date()).toString(),
             status: "registered",
@@ -81,7 +79,6 @@ const registerUser = (input, context) => {
             ...generatedInfo
         };
         let result = neo4j.registerUser(registrationInfo);
-        context.session.userInfo.status = 'registered';
         return result;
     } catch (err) {
         return err;
