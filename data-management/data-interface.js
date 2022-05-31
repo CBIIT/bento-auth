@@ -2,6 +2,11 @@ const {v4} = require('uuid')
 const neo4j = require('./neo4j-service')
 const config = require('../config');
 
+async function checkUnique(email, IDP){
+    let result = await neo4j.checkUnique(IDP+":"+email);
+    return result;
+}
+
 // Sets userInfo in the session
 async function getUserSessionData(session, email) {
     session.userInfo = {
@@ -66,7 +71,15 @@ const listUsers = (_, context) => {
     }
 }
 
-const registerUser = (input, context) => {
+const registerUser = async (input, context) => {
+    if (input.userInfo && input.userInfo.email && input.userInfo.IDP) {
+        let unique = await checkUnique(input.userInfo.email, input.userInfo.IDP)
+        if (!unique) {
+            return new Error("The provided email and IDP combination is already registered");
+        }
+    } else {
+        return new Error("Inputs for email and IDP are required inputs for registration");
+    }
     try {
         let generatedInfo = {
             userID: v4(),

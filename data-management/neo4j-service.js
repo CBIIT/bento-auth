@@ -3,6 +3,18 @@ const config = require('../config');
 const driver = neo4j.driver(config.NEO4J_URI, neo4j.auth.basic(config.NEO4J_USER, config.NEO4J_PASSWORD));
 
 //Queries
+async function checkUnique(key){
+    let parameters = {key:key};
+    const cypher =
+    `
+        MATCH (n:User)
+        WITH COLLECT(DISTINCT n.IDP+":"+n.email) AS keys
+        RETURN NOT $key in keys as result
+    `
+    const result = await executeQuery(parameters, cypher, 'result');
+    return result[0];
+}
+
 async function getMyUser(parameters) {
     const cypher =
     `
@@ -161,3 +173,4 @@ exports.deleteUser = deleteUser
 exports.disableUser = disableUser
 exports.editUser = editUser
 exports.wipeDatabase = wipeDatabase
+exports.checkUnique = checkUnique
