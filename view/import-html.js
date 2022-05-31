@@ -1,9 +1,9 @@
 const path = require('path');
 
-function importPublicHTML(express) {
+function importHTML(express) {
     return express.static(path.join(__dirname + '/../', 'public'));
 }
 
 module.exports = {
-    importPublicHTML
+    importHTML
 };

@@ -18,13 +18,13 @@ function errorHandler(err, req, res, next) {
         res.json(res.locals.message);
 }
 
-function createLogStream() {
-    const LOG_FOLDER = '/../' + 'logs';
-    if (!fs.existsSync(path.join(__dirname, LOG_FOLDER))) {
-        fs.mkdirSync(path.join(__dirname, LOG_FOLDER));
+function createLogStream(dirName) {
+    const LOG_FOLDER = 'logs';
+    if (!fs.existsSync(path.join(dirName, LOG_FOLDER))) {
+        fs.mkdirSync(path.join(dirName, LOG_FOLDER));
     }
     // create a write stream (in append mode)
-    const accessLogStream = fs.createWriteStream(path.join(__dirname, LOG_FOLDER, 'access.log'), { flags: 'a'})
+    const accessLogStream = fs.createWriteStream(path.join(dirName, LOG_FOLDER, 'access.log'), { flags: 'a'})
     return logger('combined', { stream: accessLogStream });
 }
 module.exports = {
