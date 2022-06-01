@@ -9,10 +9,12 @@ module.exports = function (passport) {
     );
 
     router.get('/external_login',
+        // passport.authenticate('loginGov', { scope: ['email'] })
         passport.authenticate('loginGov',
             {
                 successRedirect: '/',
-                failureRedirect: '/gov_login'
+                failureRedirect: '/gov_login',
+                scope: ['email']
             }
         )
     );
