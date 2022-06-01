@@ -20,7 +20,7 @@ app.use(importHTML(express));
 async function activatePassport() {
   return await require('./lib/passport')(app);
 }
-activatePassport.then((passport) => {
+activatePassport().then((passport) => {
   const authRouter = require('./routes/google-auth')(passport);
   app.use('/api/auth', authRouter);
   // catch 404 and forward to error handler
