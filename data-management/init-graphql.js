@@ -1,7 +1,7 @@
 const {buildSchema} = require('graphql');
 const data_interface = require('./data-interface');
 const {graphqlHTTP} = require("express-graphql");
-const {apiErrors} = require('./data-interface')
+const {errorType} = require('./graphql-api-constants');
 
 //Read schema from schema.graphql file
 const schema = buildSchema(require("fs").readFileSync("graphql/schema.graphql", "utf8"));
@@ -19,7 +19,7 @@ const root = {
     editUser: data_interface.editUser,
 };
 
-module.exports = graphqlHTTP((req, res, params) => {
+module.exports = graphqlHTTP((req, res) => {
     return {
         graphiql: true,
         schema: schema,
@@ -28,25 +28,7 @@ module.exports = graphqlHTTP((req, res, params) => {
             session: req.session
         },
         customFormatErrorFn: (error) => {
-            let message = error.message;
-            if (message === apiErrors.INVALID_IDP){
-                res.status(400);
-            }
-            else if (message === apiErrors.NOT_LOGGED_IN){
-                res.status(401);
-            }
-            else if (message === apiErrors.NOT_UNIQUE){
-                res.status(409);
-            }
-            else if (message === apiErrors.MISSING_INPUTS){
-                res.status(400);
-            }
-            else if (message === apiErrors.NOT_AUTHORIZED){
-                res.status(403);
-            }
-            else {
-                res.status(400);
-            }
+            res.status(errorType[error.message].statusCode);
             return error;
         }
     }

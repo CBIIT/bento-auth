@@ -37,7 +37,7 @@ input UpdateUserInput {
 
 type Query {
     "Admin only"
-    listUsers: [User]
+    listUsers(role: String = "standard", status: String = "registered"): [User]
     "Limit to current user only"
     getMyUser : User
 }

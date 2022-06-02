@@ -1,18 +1,10 @@
 const {v4} = require('uuid')
 const neo4j = require('./neo4j-service')
 const config = require('../config');
-const IDPs = ["google", "nih", "login.gov"];
-const API_ERRORS = {
-    NOT_LOGGED_IN: "User is either not logged in or not yet registered",
-    INVALID_IDP: "Invalid IDP, the valid IDPs are the following: "+IDPs.join(", "),
-    NOT_UNIQUE: "The provided email and IDP combination is already registered",
-    MISSING_INPUTS: "Inputs for email and IDP are required inputs for registration",
-    NOT_AUTHORIZED: "Not authorized"
-}
+const {errorName, valid_idps} = require("./graphql-api-constants");
 
 async function checkUnique(email, IDP){
-    let result = await neo4j.checkUnique(IDP+":"+email);
-    return result;
+    return await neo4j.checkUnique(IDP+":"+email);
 }
 
 // Sets userInfo in the session
@@ -22,15 +14,14 @@ async function getUserSessionData(session, email) {
         idp: config.idp
     }
     let result = await neo4j.getMyUser(session.userInfo);
-    if (result){
-        if (result.status){
+    if (result) {
+        if (result.status) {
             session.userInfo.status = result.status;
         }
-        if (result.role){
+        if (result.role) {
             session.userInfo.role = result.role;
         }
     }
-    return
 }
 
 function checkAdminPermissions(userInfo) {
@@ -56,7 +47,7 @@ const getMyUser = async (_, context) => {
             return neo4j.getMyUser(userInfo);
         }
         else {
-            return new Error(API_ERRORS.NOT_LOGGED_IN)
+            return new Error(errorName.NOT_LOGGED_IN)
         }
     }
     catch (err){
@@ -71,7 +62,7 @@ const listUsers = (_, context) => {
             return neo4j.listUsers()
         }
         else {
-            new Error(API_ERRORS.NOT_AUTHORIZED)
+            new Error(errorName.NOT_AUTHORIZED)
         }
     }
     catch (err){
@@ -82,15 +73,15 @@ const listUsers = (_, context) => {
 const registerUser = async (input, context) => {
     if (input.userInfo && input.userInfo.email && input.userInfo.IDP) {
         let idp = input.userInfo.IDP;
-        if (!IDPs.includes(idp.toLowerCase())){
-            return new Error(API_ERRORS.INVALID_IDP);
+        if (!valid_idps.includes(idp.toLowerCase())){
+            return new Error(errorName.INVALID_IDP);
         }
         let unique = await checkUnique(input.userInfo.email, idp)
         if (!unique) {
-            return new Error(API_ERRORS.NOT_UNIQUE);
+            return new Error(errorName.NOT_UNIQUE);
         }
     } else {
-        return new Error(API_ERRORS.MISSING_INPUTS);
+        return new Error(errorName.MISSING_INPUTS);
     }
     try {
         let generatedInfo = {
@@ -103,8 +94,7 @@ const registerUser = async (input, context) => {
             ...input.userInfo,
             ...generatedInfo
         };
-        let result = neo4j.registerUser(registrationInfo);
-        return result;
+        return neo4j.registerUser(registrationInfo);
     } catch (err) {
         return err;
     }
@@ -141,7 +131,7 @@ function reviewUser(parameters, userInfo) {
             return neo4j.reviewUser(parameters)
         }
         else{
-            new Error(API_ERRORS.NOT_AUTHORIZED)
+            new Error(errorName.NOT_AUTHORIZED)
         }
     }
     catch (err) {
@@ -156,7 +146,7 @@ const deleteUser = (parameters, context) => {
             return neo4j.deleteUser(parameters)
         }
         else{
-            new Error(API_ERRORS.NOT_AUTHORIZED)
+            new Error(errorName.NOT_AUTHORIZED)
         }
     }
     catch (err) {
@@ -171,7 +161,7 @@ const disableUser = (parameters, context) => {
             return neo4j.disableUser(parameters)
         }
         else{
-            new Error(API_ERRORS.NOT_AUTHORIZED)
+            new Error(errorName.NOT_AUTHORIZED)
         }
     }
     catch (err) {
@@ -186,7 +176,7 @@ const editUser = (parameters, context) => {
             return neo4j.editUser(parameters)
         }
         else{
-            new Error(API_ERRORS.NOT_AUTHORIZED)
+            new Error(errorName.NOT_AUTHORIZED)
         }
     }
     catch (err) {
@@ -205,5 +195,4 @@ module.exports = {
     disableUser: disableUser,
     editUser: editUser,
     getUserSessionData: getUserSessionData,
-    apiErrors: API_ERRORS
 }
