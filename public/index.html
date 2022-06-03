@@ -25,10 +25,10 @@
     <!-- Add where you want your sign-in button to render -->
     <!-- Use an image that follows the branding guidelines in a real app -->
     <div style="display: flex;flex-direction: column;align-items: flex-start;">
-        <button id="loginGovsigninButton">Sign in with Frontend Login.gov</button>
         <button id="signinLoginGoogle"><a href="/api/auth/login_process">Sign in with Google</a></button>
         <button id="signinLoginGovButton"><a href="/api/auth/gov_external_login">Sign in Login.gov</a></button>
-        <button id="signinNihTrustButton">Sign in NIH iTrust</button>
+        <button id="signinNihTrustButton"><a href="/nih_external_login">Sign in NIH iTrust</a></button>
+        <button id="signinNihUserVerify">Get NIH User Info</button>
     </div>
     <div>
         <button id="gov_logout">Login GOV Sign out</button>
@@ -42,14 +42,25 @@
     </div>
     <p id="login_text">Not logged in</p>
     <script>
+        $("#signinNihUserVerify").click(function(){
+            const queryString = window.location.search;
+            const urlParams = new URLSearchParams(queryString);
+            const auth_code = urlParams.get('code');
+            console.log('auth_code: ' + auth_code);
+            fetch(`/nih_user?` + new URLSearchParams({
+                code: auth_code
+            }), {
+                method: 'GET'
+            })
+            .then(response => response.json())
+            .then((responseData) => {
+                console.log(JSON.stringify(responseData));
+            })
+        });
+
         $('#signinButton').click(function() {
             // signInCallback defined in step 6.
             auth2.grantOfflineAccess().then(signInCallback);
-        });
-
-        $('#loginGovsigninButton').click(function() {
-            // signInCallback defined in step 6.
-            auth2.grantOfflineAccess().then(loginGovsignInCallback);
         });
 
         $('#gov_logout').click(function() {
