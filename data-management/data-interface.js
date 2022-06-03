@@ -55,18 +55,24 @@ const getMyUser = async (_, context) => {
     }
 }
 
-const listUsers = (_, context) => {
+const listUsers = (input, context) => {
     try{
         let userInfo = context.session.userInfo;
-        if (checkAdminPermissions(userInfo)) {
-            return neo4j.listUsers()
+        //Check if not logged in
+        if (!userInfo){
+            return new Error(errorName.NOT_LOGGED_IN);
         }
+        //Check if not admin
+        else if (!checkAdminPermissions(userInfo)) {
+            return new Error(errorName.NOT_AUTHORIZED);
+        }
+        //Execute query
         else {
-            new Error(errorName.NOT_AUTHORIZED)
+            return neo4j.listUsers(input);
         }
     }
     catch (err){
-        return err
+        return err;
     }
 }
 
@@ -126,12 +132,22 @@ const rejectUser = (parameters, context) => {
 
 function reviewUser(parameters, userInfo) {
     try{
-        if (checkAdminPermissions(userInfo)) {
-            parameters.approvalDate = (new Date()).toString()
-            return neo4j.reviewUser(parameters)
+        //Check if not logged in
+        if (!userInfo){
+            return new Error(errorName.NOT_LOGGED_IN);
         }
-        else{
-            new Error(errorName.NOT_AUTHORIZED)
+        //Check if not admin
+        else if (!checkAdminPermissions(userInfo)) {
+            return new Error(errorName.NOT_AUTHORIZED);
+        }
+        //Execute query
+        else {
+            parameters.approvalDate = (new Date()).toString()
+            let response = neo4j.reviewUser(parameters)
+            if (parameters.comment){
+                console.log(parameters.comment);
+            }
+            return response;
         }
     }
     catch (err) {

@@ -49,8 +49,8 @@ type Mutation {
     updateMyUser (userInfo: UpdateUserInput!): User
 
     "Admin only operations"
-    approveUser (userID: ID!, role: String): User
-    rejectUser (userID: ID!, comment: String): User
+    approveUser (userID: ID!, role: String = "standard"): User
+    rejectUser (userID: ID!, comment: String = ""): User
     deleteUser (userID: ID!): User
     disableUser (userID: ID!): User
     editUser(userID: ID!, role: String, status: String, organization: String, acl: [String]): User

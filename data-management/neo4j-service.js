@@ -16,6 +16,7 @@ async function checkUnique(key){
 }
 
 async function getMyUser(parameters) {
+    console.log(parameters);
     const cypher =
     `
         MATCH (user:User)
@@ -29,14 +30,15 @@ async function getMyUser(parameters) {
     return;
 }
 
-async function listUsers() {
+async function listUsers(parameters) {
     const cypher =
     `
         MATCH (user:User)
+        WHERE user.role = $role AND user.status = $status
         return user 
     `
     const users = []
-    const result = await executeQuery({}, cypher, 'user');
+    const result = await executeQuery(parameters, cypher, 'user');
     result.forEach(x => {users.push(x.properties)});
     return users;
 }
@@ -83,6 +85,9 @@ async function updateMyUser(parameters) {
 
 async function reviewUser(parameters) {
     //Used by both approveUser and rejectUser
+    if(!parameters.role){
+        parameters.role = "standard";
+    }
     const cypher =
     `
         MATCH (user:User)
@@ -90,10 +95,17 @@ async function reviewUser(parameters) {
             user.userID = $userID
         SET user.approvalDate = $approvalDate
         SET user.status = $status
+        SET user.role = $role
         RETURN user
     `
     const result = await executeQuery(parameters, cypher, 'user');
-    return result[0].properties;
+    try{
+        return result[0].properties;
+    }
+    catch(err){
+        return [];
+    }
+
 }
 
 async function deleteUser(parameters) {

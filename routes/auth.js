@@ -12,7 +12,7 @@ router.post('/login', async function(req, res, next) {
     const { name, tokens, email } = await idpClient.login(code);
     req.session.tokens = tokens;
     await getUserSessionData(req.session, email)
-    res.json({ name });
+    res.json({ name, email });
   } catch (e) {
     console.log(e);
     if (e.code && parseInt(e.code)) {

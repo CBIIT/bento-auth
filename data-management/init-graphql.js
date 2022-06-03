@@ -28,7 +28,12 @@ module.exports = graphqlHTTP((req, res) => {
             session: req.session
         },
         customFormatErrorFn: (error) => {
-            res.status(errorType[error.message].statusCode);
+            try{
+                res.status(errorType[error.message].statusCode);
+            }
+            catch(err){
+                res.status(500);
+            }
             return error;
         }
     }
