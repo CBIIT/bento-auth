@@ -6,6 +6,7 @@ exports.errorName = {
     NOT_LOGGED_IN: "NOT_LOGGED_IN",
     NOT_AUTHORIZED: "NOT_AUTHORIZED",
     NOT_UNIQUE: "NOT_UNIQUE",
+    USER_NOT_FOUND: "USER_NOT_FOUND"
 };
 
 exports.errorType = {
@@ -15,6 +16,10 @@ exports.errorType = {
     },
     INVALID_IDP: {
         message: "Invalid IDP, the valid IDPs are the following: "+valid_idps.join(", "),
+        statusCode: 400
+    },
+    USER_NOT_FOUND: {
+        message: "The specified user could not be found or does not exist",
         statusCode: 400
     },
     NOT_LOGGED_IN: {

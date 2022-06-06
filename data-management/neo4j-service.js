@@ -16,7 +16,6 @@ async function checkUnique(key){
 }
 
 async function getMyUser(parameters) {
-    console.log(parameters);
     const cypher =
     `
         MATCH (user:User)
@@ -99,13 +98,10 @@ async function reviewUser(parameters) {
         RETURN user
     `
     const result = await executeQuery(parameters, cypher, 'user');
-    try{
+    if (result && result[0]){
         return result[0].properties;
     }
-    catch(err){
-        return [];
-    }
-
+    return;
 }
 
 async function deleteUser(parameters) {

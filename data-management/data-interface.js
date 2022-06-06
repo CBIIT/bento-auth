@@ -130,10 +130,10 @@ const rejectUser = (parameters, context) => {
     return reviewUser(parameters, userInfo);
 }
 
-function reviewUser(parameters, userInfo) {
-    try{
+async function reviewUser(parameters, userInfo) {
+    try {
         //Check if not logged in
-        if (!userInfo){
+        if (!userInfo) {
             return new Error(errorName.NOT_LOGGED_IN);
         }
         //Check if not admin
@@ -143,14 +143,17 @@ function reviewUser(parameters, userInfo) {
         //Execute query
         else {
             parameters.approvalDate = (new Date()).toString()
-            let response = neo4j.reviewUser(parameters)
-            if (parameters.comment){
-                console.log(parameters.comment);
+            let response = await neo4j.reviewUser(parameters)
+            if (response) {
+                if (parameters.comment) {
+                    console.log(parameters.comment);
+                }
+                return response;
+            } else {
+                return new Error(errorName.USER_NOT_FOUND);
             }
-            return response;
         }
-    }
-    catch (err) {
+    } catch (err) {
         return err;
     }
 }
