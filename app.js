@@ -34,6 +34,10 @@ activatePassport().then((passport) => {
     app.use('/api/auth', authRouter);
     const nihRouter = require('./routes/nih-auth')(passport);
     app.use('', nihRouter);
+
+    const govLoginRouter = require('./routes/gov-login-auth');
+    app.use('', govLoginRouter);
+
   // catch 404 and forward to error handler
     app.use(throwError);
     app.use(errorHandler);

@@ -3,25 +3,36 @@ const router = express.Router();
 const url = require('url');
 const config = require('../config');
 const nodeFetch = require("node-fetch");
+const crypto = require("crypto");
 
-module.exports = function (passport) {
+
+function randomString(length) {
+    return crypto.randomBytes(length).toString('hex'); // source: https://github.com/18F/fs-permit-platform/blob/c613a73ae320980e226d301d0b34881f9d954758/server/src/util.es6#L232-L237
+}
+
+module.exports = function () {
 
     // TODO ADD Custom Redirect URL
     router.get(
-        '/nih_external_login',
+        '/gov_external_login',
         (request, response, next) => {
             const urlParam = {
-                client_id: config.nih.clientId,
-                redirect_uri: "http://localhost:4010/profile",
-                ...config.nih.params
+                client_id: config.login_gov.clientId,
+                code_challenge: config.login_gov.code_challenge,
+                code_challenge_method: "S256",
+                redirect_uri: "http://localhost:4010/log_gov_profile",
+                response_type:"code",
+                nonce: randomString(32),
+                state: randomString(32),
+                ...config.login_gov.params
             }
             const params = new URLSearchParams(urlParam).toString();
-            response.redirect(`${config.nih.authorizeUrl}?${params}`);
+            response.redirect(`${config.login_gov.authorizeUrl}?${params}`);
         }
     );
 
     router.get(
-        '/profile',
+        '/log_gov_profile',
         (request, response, next) => {
             const queryObject = url.parse(request.url, true).query;
             response.redirect('/?code='+ queryObject.code);
@@ -29,7 +40,7 @@ module.exports = function (passport) {
     );
 
     router.get(
-        '/nih_user',
+        '/log_gov_user',
         async (request, response, next) => {
             const queryObject = url.parse(request.url, true).query;
             const auth_code = queryObject.code;
@@ -40,7 +51,7 @@ module.exports = function (passport) {
     );
 
     async function getUserInfo(accessToken) {
-        const response = await nodeFetch('https://stsstg.nih.gov/openid/connect/v1/userinfo', {
+        const response = await nodeFetch(config.login_gov.userInfoUrl, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ` + accessToken
@@ -51,20 +62,16 @@ module.exports = function (passport) {
     }
 
     async function getToken(auth_code) {
-
         // TODO add custom redirect url
-        const response = await nodeFetch(config.nih.tokenUrl, {
+        const response = await nodeFetch(config.login_gov.tokenUrl, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
             body: new URLSearchParams({
                 code: auth_code,
-                redirect_uri: "http://localhost:4010/profile",
-                grant_type: "authorization_code",
-                client_id: config.nih.clientId,
-                client_secret: config.nih.clientSecret,
-                scope: "openid email profile"
+                code_verifier: config.login_gov.code_verifier,
+                grant_type: "authorization_code"
             })
         });
         const jsonResponse = await response.json();
@@ -72,8 +79,8 @@ module.exports = function (passport) {
         return token;
     }
 
-    router.get('/nih_login', (req, res) => {
-        res.send('<span>nih login failed</span>');
+    router.get('/gov_login_failed', (req, res) => {
+        res.send('<span>login gov failed</span>');
     });
 
     return router;
