@@ -19,6 +19,13 @@ const config = {
   DATA_FILE: process.env.DATA_FILE,
   //Testing
   TEST_EMAIL: process.env.TEST_EMAIL,
+
+  // Email settings
+  mailerHost: process.env.MAILER_HOST,
+  mailerPort: process.env.MAILER_PORT,
+  mailerUser: process.env.MAILER_USER,
+  mailerPassword: process.env.MAILER_PASSWORD,
+  serviceEmail: process.env.SERVICE_EMAIL,
 };
 
 if (!config.version) {
