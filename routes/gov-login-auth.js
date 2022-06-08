@@ -18,10 +18,7 @@ module.exports = function () {
         (request, response, next) => {
             const urlParam = {
                 client_id: config.login_gov.clientId,
-                code_challenge: config.login_gov.code_challenge,
-                code_challenge_method: "S256",
                 redirect_uri: "http://localhost:4010/log_gov_profile",
-                response_type:"code",
                 nonce: randomString(32),
                 state: randomString(32),
                 ...config.login_gov.params
@@ -70,8 +67,9 @@ module.exports = function () {
             },
             body: new URLSearchParams({
                 code: auth_code,
-                code_verifier: config.login_gov.code_verifier,
-                grant_type: "authorization_code"
+                client_assertion: config.login_gov.codeAssertion,
+                client_assertion_type: config.login_gov.codeAssertionType,
+                grant_type: config.login_gov.grantType,
             })
         });
         const jsonResponse = await response.json();
