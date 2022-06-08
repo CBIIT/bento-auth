@@ -1,7 +1,7 @@
 const {v4} = require('uuid')
 const neo4j = require('./neo4j-service')
 const config = require('../config');
-const {errorName, valid_idps} = require("./graphql-api-constants");
+const {errorName, valid_idps, errorType} = require("./graphql-api-constants");
 
 async function checkUnique(email, IDP){
     return await neo4j.checkUnique(IDP+":"+email);
@@ -15,13 +15,23 @@ async function getUserSessionData(session, email) {
     }
     let result = await neo4j.getMyUser(session.userInfo);
     if (result) {
-        if (result.status) {
+        if (result.status && result.status === 'approved') {
             session.userInfo.status = result.status;
+        } else {
+            console.warn('User has not been approved!')
+            throw errorType.NOT_AUTHORIZED;
         }
         if (result.role) {
             session.userInfo.role = result.role;
+        } else {
+            console.warn('User doesn\'t have a role assigned!')
+            throw errorType.NOT_AUTHORIZED;
         }
+    } else {
+        console.warn('User not registered!')
+        throw errorType.USER_NOT_FOUND;
     }
+
 }
 
 function checkAdminPermissions(userInfo) {

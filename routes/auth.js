@@ -17,6 +17,8 @@ router.post('/login', async function(req, res, next) {
     console.log(e);
     if (e.code && parseInt(e.code)) {
       res.status(e.code);
+    } else if (e.statusCode && parseInt(e.statusCode)) {
+      res.status(e.statusCode);
     } else {
       res.status(500);
     }
