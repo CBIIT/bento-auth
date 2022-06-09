@@ -5,6 +5,7 @@ exports.errorName = {
     INVALID_IDP: "INVALID_IDP",
     NOT_LOGGED_IN: "NOT_LOGGED_IN",
     NOT_AUTHORIZED: "NOT_AUTHORIZED",
+    NOT_APPROVED: 'NOT_APPROVED',
     NOT_UNIQUE: "NOT_UNIQUE",
     USER_NOT_FOUND: "USER_NOT_FOUND"
 };
@@ -28,6 +29,10 @@ exports.errorType = {
     },
     NOT_AUTHORIZED: {
         message: "Not authorized",
+        statusCode: 403
+    },
+    NOT_APPROVED: {
+        message: "User has not been approved",
         statusCode: 403
     },
     NOT_UNIQUE: {

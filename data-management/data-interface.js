@@ -19,7 +19,7 @@ async function getUserSessionData(session, email) {
             session.userInfo.status = result.status;
         } else {
             console.warn('User has not been approved!')
-            throw errorType.NOT_AUTHORIZED;
+            throw errorType.NOT_APPROVED;
         }
         if (result.role) {
             session.userInfo.role = result.role;
