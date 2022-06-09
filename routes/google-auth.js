@@ -1,5 +1,5 @@
 const express = require('express');
-const {authenticated, logout} = require("../controllers/google-auth");
+const {authenticated, logout} = require("../controllers/auth-api");
 const router = express.Router();
 const idpClient = require('../idps');
 

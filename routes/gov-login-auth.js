@@ -4,6 +4,7 @@ const url = require('url');
 const config = require('../config');
 const nodeFetch = require("node-fetch");
 const crypto = require("crypto");
+const {userInfo} = require("../controllers/auth-api");
 
 
 function randomString(length) {
@@ -41,9 +42,9 @@ module.exports = function () {
         async (request, response, next) => {
             const queryObject = url.parse(request.url, true).query;
             const auth_code = queryObject.code;
-            const token = await getToken(auth_code);
             try {
-                const user = await getUserInfo(token);
+                const token = request.session.tokens ? request.session.tokens : await getToken(auth_code);
+                const user = await userInfo(token);
                 request.session.tokens = token;
                 response.send({ user });
 
@@ -54,17 +55,6 @@ module.exports = function () {
             }
         }
     );
-
-    async function getUserInfo(accessToken) {
-        const response = await nodeFetch(config.login_gov.userInfoUrl, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ` + accessToken
-            }
-        });
-        const jsonResponse = await response.json();
-        return jsonResponse;
-    }
 
     async function getToken(auth_code) {
         // TODO add custom redirect url
@@ -86,12 +76,11 @@ module.exports = function () {
     }
 
     router.get('/gov_login_failed', (req, res) => {
-        res.send('<span>login gov failed</span>');
+        res.send('<span>lib gov failed</span>');
     });
 
     router.get('/gov_logout', async (req, res) => {
         //TODO
-
         const response = await nodeFetch(config.login_gov.tokenUrl, {
             method: 'POST',
             headers: {
@@ -103,10 +92,9 @@ module.exports = function () {
                 grant_type: config.login_gov.grantType,
             })
         });
-
         const params = new URLSearchParams(urlParam).toString();
         res.redirect(`${config.nih.authorizeUrl}?${params}`);
-        res.send('<span>login gov failed</span>');
+        res.send('<span>lib gov failed</span>');
     });
     return router;
 }

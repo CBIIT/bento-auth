@@ -3,8 +3,9 @@ const router = express.Router();
 const url = require('url');
 const config = require('../config');
 const nodeFetch = require("node-fetch");
+const {userInfo} = require("../controllers/auth-api");
 
-module.exports = function (passport) {
+module.exports = ()=> {
 
     // TODO ADD Custom Redirect URL
     router.get(
@@ -33,10 +34,9 @@ module.exports = function (passport) {
         async (request, response, next) => {
             const queryObject = url.parse(request.url, true).query;
             const auth_code = queryObject.code;
-
             try {
-                const token = await getToken(auth_code);
-                const user = await getUserInfo(token);
+                const token = request.session.tokens ? request.session.tokens : await getToken(auth_code);
+                const user = await userInfo(token);
                 request.session.tokens = token;
                 response.send({ user });
             } catch (e) {
@@ -46,17 +46,6 @@ module.exports = function (passport) {
             }
         }
     );
-
-    async function getUserInfo(accessToken) {
-        const response = await nodeFetch(config.nih.userInfoUrl, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ` + accessToken
-            }
-        });
-        const jsonResponse = await response.json();
-        return jsonResponse;
-    }
 
     async function getToken(auth_code) {
 
@@ -81,7 +70,7 @@ module.exports = function (passport) {
     }
 
     router.get('/nih_login', (req, res) => {
-        res.send('<span>nih login failed</span>');
+        res.send('<span>nih lib failed</span>');
     });
 
     // TODO NIH LOGOUT

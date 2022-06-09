@@ -29,12 +29,11 @@
 <!--        <button id="signinLoginGoogle"><a href="/api/auth/login_process">Sign in with Google</a></button>-->
         <button id="signinLoginGovButton"><a href="/gov_external_login">Sign in Login.gov</a></button>
         <button id="signinNihTrustButton"><a href="/nih_external_login">Sign in NIH iTrust</a></button>
-        <button id="nihUserVerify">Get NIH User Info</button>
-        <button id="govUserVerify">Get Gov Login User Info</button>
     </div>
     <div>
-        <button id="logout">Google Sign out</button>
-        <button id="gov_logout">Login GOV Sign out</button>
+        <button id="logout">Google Sign out</button><br>
+        <!--        TODO GOV LOG-OUT-->
+        <button id="gov_logout">Login GOV Sign out</button><br>
         <button id="nih_logout">NIH Sign out</button>
     </div>
     <div>
@@ -45,38 +44,6 @@
     </div>
     <p id="login_text">Not logged in</p>
     <script>
-        $("#nihUserVerify").click(function(){
-            const queryString = window.location.search;
-            const urlParams = new URLSearchParams(queryString);
-            const auth_code = urlParams.get('code');
-            console.log('auth_code: ' + auth_code);
-            fetch(`/nih_user?` + new URLSearchParams({
-                code: auth_code
-            }), {
-                method: 'GET'
-            })
-            .then(response => response.json())
-            .then((responseData) => {
-                console.log(JSON.stringify(responseData));
-            })
-        });
-
-        $("#govUserVerify").click(function(){
-            const queryString = window.location.search;
-            const urlParams = new URLSearchParams(queryString);
-            const auth_code = urlParams.get('code');
-            console.log('auth_code: ' + auth_code);
-            fetch(`/log_gov_user?` + new URLSearchParams({
-                code: auth_code
-            }), {
-                method: 'GET'
-            })
-                .then(response => response.json())
-                .then((responseData) => {
-                    console.log(JSON.stringify(responseData));
-                })
-        });
-
         $('#signinButton').click(function() {
             // signInCallback defined in step 6.
             auth2.grantOfflineAccess().then(signInCallback);
@@ -107,7 +74,7 @@
 
     <!-- Last part of BODY element in file index.html -->
     <script>
-        // google popup login
+        // google popup lib
         function loginGovsignInCallback(authResult) {
             console.log('loginGovsignInCallback' + authResult);
             if (authResult['code']) {
@@ -130,7 +97,7 @@
                 })();
             }
         }
-        // google popup login
+        // google popup lib
         function signInCallback(authResult) {
             if (authResult['code']) {
                 // Hide the sign-in button now that the user is authorized, for example:
@@ -197,34 +164,9 @@
             if (!urlParams.get('code') && !urlParams.get('type')) return;
             const auth_type = urlParams.get('type');
             const auth_code = urlParams.get('code');
-            if (auth_type === 'nih') {
-
-                console.log('auth_code: ' + auth_code);
-                fetch(`/nih_user?` + new URLSearchParams({
-                    code: auth_code
-                }), {
-                    method: 'GET'
-                })
-                    .then(response => response.json())
-                    .then((responseData) => {
-                        console.log(JSON.stringify(responseData));
-                        $('#login_text').text('NIH ' + responseData.user.name + ' Logged in');
-                    })
-
-            } else if (auth_type === 'gov') {
-                console.log('auth_code: ' + auth_code);
-                fetch(`/log_gov_user?` + new URLSearchParams({
-                    code: auth_code
-                }), {
-                    method: 'GET'
-                })
-                    .then(response => response.json())
-                    .then((responseData) => {
-                        console.log(JSON.stringify(responseData));
-                        $('#login_text').text('Login.GOV ' + responseData.user.email + ' Logged in');
-                    })
-
-            } else {
+            if (auth_type === 'nih') nihLogin(auth_code)
+            else if (auth_type === 'gov') govLogin(auth_code)
+            else {
                 const rawResponse = await fetch('/api/auth/authenticated/', {
                     method: 'GET'
                 });
@@ -238,6 +180,35 @@
                 console.log(content);
             }
         }
+        async function nihLogin(auth_code) {
+            console.log('auth_code: ' + auth_code);
+            fetch(`/nih_user?` + new URLSearchParams({
+                code: auth_code
+            }), {
+                method: 'GET'
+            })
+                .then(response => response.json())
+                .then((responseData) => {
+                    console.log(JSON.stringify(responseData));
+                    $('#login_text').text('NIH ' + responseData.user.name + ' Logged in');
+                })
+        }
+
+        async function govLogin(auth_code) {
+            console.log('auth_code: ' + auth_code);
+            fetch(`/log_gov_user?` + new URLSearchParams({
+                code: auth_code
+            }), {
+                method: 'GET'
+            })
+                .then(response => response.json())
+                .then((responseData) => {
+                    console.log(JSON.stringify(responseData));
+                    $('#login_text').text('Login.GOV ' + responseData.user.email + ' Logged in');
+                })
+        }
+
+
         async function requestFile() {
             const rawResponse = await fetch('/api/auth/files/BENTO-FILE-217910', {
                 method: 'GET',
