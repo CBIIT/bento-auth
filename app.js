@@ -3,6 +3,11 @@ const {createSession} = require("./services/session");
 const {errorHandler, throwError, createLogStream} = require("./middleware/error");
 const {importHTML} = require("./view/import-html");
 const cors = require('cors');
+
+const authRouter = require('./routes/google-auth')();
+const nihRouter = require('./routes/nih-auth')();
+const govLoginRouter = require('./routes/gov-login-auth')();
+
 const config = require('./config');
 console.log(config);
 const app = express();
@@ -16,20 +21,12 @@ app.use(express.urlencoded({ extended: false }));
 app.use(createSession({ session_timeout: config.session_timeout }))
 app.use(importHTML(express));
 
-async function activatePassport() {
-  return await require('./lib/passport')(app);
-}
-activatePassport().then((passport) => {
-    const authRouter = require('./routes/google-auth')(passport);
-    app.use('/api/auth', authRouter);
-    const nihRouter = require('./routes/nih-auth')(passport);
-    app.use('', nihRouter);
+app.use('/api/auth', authRouter);
+app.use('', nihRouter);
+app.use('', govLoginRouter);
 
-    const govLoginRouter = require('./routes/gov-login-auth')();
-    app.use('', govLoginRouter);
+// catch 404 and forward to error handler
+app.use(throwError);
+app.use(errorHandler);
 
-  // catch 404 and forward to error handler
-    app.use(throwError);
-    app.use(errorHandler);
-});
 module.exports = app;

@@ -42,8 +42,16 @@ module.exports = function () {
             const queryObject = url.parse(request.url, true).query;
             const auth_code = queryObject.code;
             const token = await getToken(auth_code);
-            const user = await getUserInfo(token);
-            response.send({"msg": user});
+            try {
+                const user = await getUserInfo(token);
+                request.session.tokens = token;
+                response.send({ user });
+
+            } catch (e) {
+                console.log(e);
+                response.status(500);
+                response.json({error: e.message});
+            }
         }
     );
 

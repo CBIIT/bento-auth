@@ -1,56 +1,29 @@
 const express = require('express');
-const {googleAuthenticated, googleLogout} = require("../controllers/google-auth");
+const {authenticated, logout} = require("../controllers/google-auth");
 const router = express.Router();
+const idpClient = require('../idps');
 
 
-module.exports = function (passport) {
-    router.get('/login_process',
-      passport.authenticate('google', { scope: ['profile', 'email'] })
-    );
-
-    router.get('/gov_external_login',
-      passport.authenticate('loginGov', { scope: ['email'] })
-    );
-
-    router.get('/external_login',
-        passport.authenticate('loginGov',
-            {
-                successRedirect: '/',
-                failureRedirect: '/gov_login',
-                scope: ['email']
+module.exports = function () {
+    /* Login */
+    router.post('/login', async function(req, res, next) {
+        try {
+            const code = req.body['code'];
+            const { name, tokens } = await idpClient.login(code);
+            req.session.tokens = tokens;
+            res.json({ name });
+        } catch (e) {
+            console.log(e);
+            if (e.code && parseInt(e.code)) {
+                res.status(e.code);
+            } else {
+                res.status(500);
             }
-        )
-    );
 
-    router.get('/google/callback',
-      // TODO SET Failure Redirect
-      passport.authenticate('google', {
-          successRedirect: '/',
-          failureRedirect: '/gov_login'
-      })
-    );
-
-    router.get('/gov_logout', (request, response, next) => {
-        console.log("user:" + request.user);
-        if (request.user) {
-            // var postLogoutRedirectUrl = `http://localhost:4010${logoutPath}`; // redirect to the logout path to sign the user out of this app after the response comes back, or else the user will still be signed in!
-            var postLogoutRedirectUrl = `http://localhost:4010/`; // redirect to the logout path to sign the user out of this app after the response comes back, or else the user will still be signed in!
-            var requestUrl = `https://idp.int.identitysandbox.gov/openid_connect/logout?id_token_hint=${request.user.token}&post_logout_redirect_uri=${postLogoutRedirectUrl}&state=${request.user.state}`;
-            // request.logout(() => response.redirect('/'));
-            request.logout(() => response.redirect('/'));
-            //return response.redirect(requestUrl);
+            res.json({error: e.message});
         }
-        // request.logout(function(err) {
-        //     if (err) {
-        //         return next(err);
-        //     }
-        //     request.session.destroy();
-        //     response.send({status: 'success'});
-        //     // return response.redirect('/');
-        // });
     });
-
-    router.get('/logout', googleLogout);
-    router.get('/authenticated', googleAuthenticated);
+    router.get('/logout', logout);
+    router.get('/authenticated', authenticated);
     return router;
 }

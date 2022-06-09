@@ -33,14 +33,22 @@ module.exports = function (passport) {
         async (request, response, next) => {
             const queryObject = url.parse(request.url, true).query;
             const auth_code = queryObject.code;
-            const token = await getToken(auth_code);
-            const user = await getUserInfo(token);
-            response.send({"msg": user});
+
+            try {
+                const token = await getToken(auth_code);
+                const user = await getUserInfo(token);
+                request.session.tokens = token;
+                response.send({ user });
+            } catch (e) {
+                console.log(e);
+                response.status(500);
+                response.json({error: e.message});
+            }
         }
     );
 
     async function getUserInfo(accessToken) {
-        const response = await nodeFetch('https://stsstg.nih.gov/openid/connect/v1/userinfo', {
+        const response = await nodeFetch(config.nih.userInfoUrl, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ` + accessToken
