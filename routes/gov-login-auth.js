@@ -32,7 +32,7 @@ module.exports = function () {
         '/log_gov_profile',
         (request, response, next) => {
             const queryObject = url.parse(request.url, true).query;
-            response.redirect('/?code='+ queryObject.code);
+            response.redirect(`/?code=${queryObject.code}&type=gov`);
         }
     );
 
@@ -89,5 +89,24 @@ module.exports = function () {
         res.send('<span>login gov failed</span>');
     });
 
+    router.get('/gov_logout', async (req, res) => {
+        //TODO
+
+        const response = await nodeFetch(config.login_gov.tokenUrl, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ` + accessToken
+            },
+            body: new URLSearchParams({
+                id_token: req.session.tokens,
+                client_assertion_type: config.login_gov.codeAssertionType,
+                grant_type: config.login_gov.grantType,
+            })
+        });
+
+        const params = new URLSearchParams(urlParam).toString();
+        res.redirect(`${config.nih.authorizeUrl}?${params}`);
+        res.send('<span>login gov failed</span>');
+    });
     return router;
 }

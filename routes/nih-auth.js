@@ -24,7 +24,7 @@ module.exports = function (passport) {
         '/profile',
         (request, response, next) => {
             const queryObject = url.parse(request.url, true).query;
-            response.redirect('/?code='+ queryObject.code);
+            response.redirect(`/?code=${queryObject.code}&type=nih`);
         }
     );
 
@@ -82,6 +82,31 @@ module.exports = function (passport) {
 
     router.get('/nih_login', (req, res) => {
         res.send('<span>nih login failed</span>');
+    });
+
+    // TODO NIH LOGOUT
+    router.get('/nih_logout', async (req, res) => {
+        try {
+            // TODO add custom redirect url
+            const response = await nodeFetch(config.nih.logoutUrl, {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Basic ' + Buffer.from(config.nih.clientId + ':' + config.nih.clientSecret).toString('base64')
+                },
+                body: new URLSearchParams({
+                    id_token: req.session.tokens,
+                })
+            });
+            const jsonResponse = await response.json();
+            console.log('jsonResponse' + jsonResponse);
+            if (jsonResponse.session_status) {
+                res.status(200).send({status: 'success'});
+            } else throw 500;
+        } catch (e) {
+            console.log(e);
+            res.status(500);
+            res.json({error: e.message});
+        }
     });
 
     return router;
