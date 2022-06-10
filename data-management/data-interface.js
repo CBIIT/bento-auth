@@ -18,17 +18,17 @@ async function getUserSessionData(session, email) {
         if (result.status && result.status === 'approved') {
             session.userInfo.status = result.status;
         } else {
-            console.warn('User has not been approved!')
+            console.warn(`User "${email}" has not been approved!`)
             throw errorType.NOT_APPROVED;
         }
         if (result.role) {
             session.userInfo.role = result.role;
         } else {
-            console.warn('User doesn\'t have a role assigned!')
+            console.warn(`User "${email}" does not have a role assigned!`)
             throw errorType.NOT_AUTHORIZED;
         }
     } else {
-        console.warn('User not registered!')
+        console.warn(`User "${email}" has not registered!`)
         throw errorType.USER_NOT_FOUND;
     }
 
