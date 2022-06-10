@@ -10,20 +10,23 @@ module.exports = ()=> {
     // TODO ADD Custom Redirect URL
     router.get(
         '/nih_external_login',
-        (request, response, next) => {
+        (request, response) => {
             const urlParam = {
-                client_id: config.nih.clientId,
+                client_id: config.nih.CLIENT_ID,
                 redirect_uri: "http://localhost:4010/profile",
-                ...config.nih.params
+                response_type: "code",
+                scope: config.nih.SCOPE
             }
+            // Optional parameter; to force re-authorization event when a current session is active
+            if (config.nih.PROMPT) urlParam.prompt = config.nih.PROMPT;
             const params = new URLSearchParams(urlParam).toString();
-            response.redirect(`${config.nih.authorizeUrl}?${params}`);
+            response.redirect(`${config.nih.AUTHORIZE_URL}?${params}`);
         }
     );
 
     router.get(
         '/profile',
-        (request, response, next) => {
+        (request, response) => {
             const queryObject = url.parse(request.url, true).query;
             response.redirect(`/?code=${queryObject.code}&type=nih`);
         }
@@ -31,7 +34,7 @@ module.exports = ()=> {
 
     router.get(
         '/nih_user',
-        async (request, response, next) => {
+        async (request, response) => {
             const queryObject = url.parse(request.url, true).query;
             const auth_code = queryObject.code;
             try {
@@ -50,7 +53,7 @@ module.exports = ()=> {
     async function getToken(auth_code) {
 
         // TODO add custom redirect url
-        const response = await nodeFetch(config.nih.tokenUrl, {
+        const response = await nodeFetch(config.nih.TOKEN_URL, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
@@ -59,8 +62,8 @@ module.exports = ()=> {
                 code: auth_code,
                 redirect_uri: "http://localhost:4010/profile",
                 grant_type: "authorization_code",
-                client_id: config.nih.clientId,
-                client_secret: config.nih.clientSecret,
+                client_id: config.nih.CLIENT_ID,
+                client_secret: config.nih.CLIENT_SECRET,
                 scope: "openid email profile"
             })
         });
@@ -77,10 +80,10 @@ module.exports = ()=> {
     router.get('/nih_logout', async (req, res) => {
         try {
             // TODO add custom redirect url
-            const response = await nodeFetch(config.nih.logoutUrl, {
+            const response = await nodeFetch(config.nih.LOGOUT_URL, {
                 method: 'POST',
                 headers: {
-                    'Authorization': 'Basic ' + Buffer.from(config.nih.clientId + ':' + config.nih.clientSecret).toString('base64')
+                    'Authorization': 'Basic ' + Buffer.from(config.nih.CLIENT_ID + ':' + config.nih.CLIENT_SECRET).toString('base64')
                 },
                 body: new URLSearchParams({
                     id_token: req.session.tokens,
@@ -89,7 +92,18 @@ module.exports = ()=> {
             const jsonResponse = await response.json();
             console.log('jsonResponse' + jsonResponse);
             if (jsonResponse.session_status) {
-                res.status(200).send({status: 'success'});
+                // TODO add logout module
+                if (req.session) {
+                    req.session.destroy( (err) => {
+                        if (err) {
+                            console.log(err);
+                            return res.status(500).send({errors: err});
+                        }
+                        res.status(200).send({status: 'success'});
+                    });
+                } else {
+                    return res.status(200).send({status: 'success'});
+                }
             } else throw 500;
         } catch (e) {
             console.log(e);

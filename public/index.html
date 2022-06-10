@@ -12,7 +12,7 @@
         function start() {
             gapi.load('auth2', function() {
                 auth2 = gapi.auth2.init({
-                    client_id: '196014713877-0d926jpdd691roubuc0kpu6r6ha9b9t5.apps.googleusercontent.com',
+                    client_id: '',
                     // Scopes to request in addition to 'profile' and 'email'
                     //scope: 'additional_scope'
                 });
@@ -190,7 +190,7 @@
                 .then(response => response.json())
                 .then((responseData) => {
                     console.log(JSON.stringify(responseData));
-                    $('#login_text').text('NIH ' + responseData.user.name + ' Logged in');
+                    $('#login_text').text(responseData.user.name ?  'NIH ' + responseData.user.name + ' Logged in': 'Not logged in');
                 })
         }
 

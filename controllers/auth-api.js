@@ -33,7 +33,7 @@ exports.authenticated = (req, res) => {
 }
 
 exports.userInfo = async (accessToken) => {
-    const response = await nodeFetch(config.nih.userInfoUrl, {
+    const response = await nodeFetch(config.nih.USERINFO_URL, {
         method: 'GET',
         headers: {
             'Authorization': `Bearer ` + accessToken
