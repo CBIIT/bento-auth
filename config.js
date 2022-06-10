@@ -9,7 +9,7 @@ const config = {
   redirect_url: process.env.REDIRECT_URL,
   cookie_secret: process.env.COOKIE_SECRET,
   session_timeout: process.env.SESSION_TIMEOUT ? parseInt(process.env.SESSION_TIMEOUT) : 30 * 60,  // 30 minutes
-  authorization_enabled: process.env.AUTHORIZATION_ENABLED ? process.env.AUTHORIZATION_ENABLED.toLowerCase() === 'true' : false,
+  authorization_enabled: process.env.AUTHORIZATION_ENABLED ? process.env.AUTHORIZATION_ENABLED.toLowerCase() === 'true' : true,
 
   //Neo4j connection
   NEO4J_URI: process.env.NEO4J_URI,
