@@ -7,8 +7,7 @@ const config = {
   cookie_secret: process.env.COOKIE_SECRET,
   session_timeout: process.env.SESSION_TIMEOUT ? parseInt(process.env.SESSION_TIMEOUT) : 30 * 60,
   google: JSON.parse(process.env.GOOGLE_LOGIN),
-  nih: JSON.parse(process.env.NIH_LOGIN),
-  login_gov: JSON.parse(process.env.LOGIN_GOV)
+  nih: JSON.parse(process.env.NIH_LOGIN)
 };
 
 if (!config.version) {

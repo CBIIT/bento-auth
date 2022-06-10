@@ -26,14 +26,12 @@
     <!-- Use an image that follows the branding guidelines in a real app -->
     <div style="display: flex;flex-direction: column;align-items: flex-start;">
         <button id="signinButton">Sign in with Google</button>
-<!--        <button id="signinLoginGoogle"><a href="/api/auth/login_process">Sign in with Google</a></button>-->
-        <button id="signinLoginGovButton"><a href="/gov_external_login">Sign in Login.gov</a></button>
         <button id="signinNihTrustButton"><a href="/nih_external_login">Sign in NIH iTrust</a></button>
     </div>
     <div>
         <button id="logout">Google Sign out</button><br>
         <!--        TODO GOV LOG-OUT-->
-        <button id="gov_logout">Login GOV Sign out</button><br>
+<!--        <button id="gov_logout">Login GOV Sign out</button><br>-->
         <button id="nih_logout">NIH Sign out</button>
     </div>
     <div>
@@ -47,10 +45,6 @@
         $('#signinButton').click(function() {
             // signInCallback defined in step 6.
             auth2.grantOfflineAccess().then(signInCallback);
-        });
-
-        $('#gov_logout').click(function() {
-            govSignOut();
         });
 
         $('#nih_logout').click(function() {
@@ -75,29 +69,6 @@
     <!-- Last part of BODY element in file index.html -->
     <script>
         // google popup lib
-        function loginGovsignInCallback(authResult) {
-            console.log('loginGovsignInCallback' + authResult);
-            if (authResult['code']) {
-                // $('#signinButton').css('display', 'none');
-                (async () => {
-                    const rawResponse = await fetch('/api/auth/login/', {
-                        method: 'POST',
-                        headers: {
-                            'Accept': 'application/json',
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({ code: authResult['code'] })
-                    });
-                    const content = await rawResponse.json();
-                    if (content.name) {
-                        $('#login_text').text("Logged in");
-                    } else {
-                        $('#login_text').text("Not logged in");
-                    }
-                })();
-            }
-        }
-        // google popup lib
         function signInCallback(authResult) {
             if (authResult['code']) {
                 // Hide the sign-in button now that the user is authorized, for example:
@@ -108,7 +79,8 @@
                         method: 'POST',
                         headers: {
                             'Accept': 'application/json',
-                            'Content-Type': 'application/json'
+                            'Content-Type': 'application/json',
+                            'Login-Type': 'google'
                         },
                         body: JSON.stringify({code: authResult['code']})
                     });
@@ -121,20 +93,7 @@
         }
 
         async function nihSignOut() {
-            const rawResponse = await fetch('/nih_logout', {
-                method: 'GET'
-            });
-            const content = await rawResponse.json();
-
-            if (content.status) {
-                $('#login_text').text("Not logged in");
-                $('#signinButton').css('display', 'block');
-            }
-            console.log(content);
-        }
-
-        async function govSignOut() {
-            const rawResponse = await fetch('/gov_logout', {
+            const rawResponse = await fetch('/api/auth/logout?type=NIH', {
                 method: 'GET'
             });
             const content = await rawResponse.json();
@@ -147,7 +106,7 @@
         }
 
         async function signOut() {
-            const rawResponse = await fetch('/api/auth/logout/', {
+            const rawResponse = await fetch('/api/auth/logout?type=google', {
                 method: 'GET'
             });
             const content = await rawResponse.json();
@@ -164,28 +123,28 @@
             if (!urlParams.get('code') && !urlParams.get('type')) return;
             const auth_type = urlParams.get('type');
             const auth_code = urlParams.get('code');
+            // NIH LOGIN
             if (auth_type === 'nih') nihLogin(auth_code)
-            else if (auth_type === 'gov') govLogin(auth_code)
+            // GOOGLE LOGIN
             else {
                 const rawResponse = await fetch('/api/auth/authenticated/', {
                     method: 'GET'
                 });
                 const content = await rawResponse.json();
-                if (content.status) {
-                    $('#login_text').text("Logged in");
-                } else {
-                    $('#login_text').text("Not logged in");
-                }
-
+                if (content.status) $('#login_text').text("Google Logged in");
+                else $('#login_text').text("Not logged in");
                 console.log(content);
             }
         }
         async function nihLogin(auth_code) {
             console.log('auth_code: ' + auth_code);
-            fetch(`/nih_user?` + new URLSearchParams({
-                code: auth_code
-            }), {
-                method: 'GET'
+            fetch(`/api/auth/login`, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({code: auth_code, type: 'NIH'})
             })
                 .then(response => response.json())
                 .then((responseData) => {
@@ -193,21 +152,6 @@
                     $('#login_text').text(responseData.user.name ?  'NIH ' + responseData.user.name + ' Logged in': 'Not logged in');
                 })
         }
-
-        async function govLogin(auth_code) {
-            console.log('auth_code: ' + auth_code);
-            fetch(`/log_gov_user?` + new URLSearchParams({
-                code: auth_code
-            }), {
-                method: 'GET'
-            })
-                .then(response => response.json())
-                .then((responseData) => {
-                    console.log(JSON.stringify(responseData));
-                    $('#login_text').text('Login.GOV ' + responseData.user.email + ' Logged in');
-                })
-        }
-
 
         async function requestFile() {
             const rawResponse = await fetch('/api/auth/files/BENTO-FILE-217910', {

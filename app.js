@@ -4,9 +4,8 @@ const {errorHandler, throwError, createLogStream} = require("./middleware/error"
 const {importHTML} = require("./view/import-html");
 const cors = require('cors');
 
-const authRouter = require('./routes/google-auth')();
+const authRouter = require('./routes/auth')();
 const nihRouter = require('./routes/nih-auth')();
-const govLoginRouter = require('./routes/gov-login-auth')();
 
 const config = require('./config');
 console.log(config);
@@ -23,7 +22,6 @@ app.use(importHTML(express));
 
 app.use('/api/auth', authRouter);
 app.use('', nihRouter);
-app.use('', govLoginRouter);
 
 // catch 404 and forward to error handler
 app.use(throwError);
