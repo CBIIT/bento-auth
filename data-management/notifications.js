@@ -1,52 +1,72 @@
 const {sendEmail} = require("./email");
+const yaml = require('js-yaml');
+const fs   = require('fs');
 
-const EMAIL_PLACEHOLDERS = {
-    PLACEHOLDER_SENDER: "bento-notifications@email.com",
-    ADMIN_NOTIFICATION_SUBJECT: "Bento user registration received",
-    ADMIN_NOTIFICATION_CONTENT: "There is a new user registration pending review",
-    CONFIRMATION_SUBJECT: "Bento registration confirmation",
-    CONFIRMATION_CONTENT: "Thank you for your interest in Bento Software, your registration has been received and is under review",
-    APPROVAL_SUBJECT: "Bento account approved",
-    APPROVAL_CONTENT: "Thank you for your interest in Bento Software, your account has been approved. You can now log in to Bento via this url [include URL]. If further assistance is required, please contact the Bento help desk at bento-help@nih.gov",
-    REJECTION_SUBJECT: "Bento account rejected",
-    REJECTION_CONTENT1: "Thank you for your interest in Bento Software, your account has been rejected according to the following criteria: ",
-    REJECTION_CONTENT2: ". For further assistance please contact the Bento help desk at bento-help@nih.gov"
+let email_constants = undefined
+try{
+    email_constants = yaml.load(fs.readFileSync('yaml/notification_email_values.yaml', 'utf8'));
 }
+catch (e) {
+    console.error(e)
+}
+
 
 module.exports = {
     sendAdminNotification: async (admins) => {
-        if (Array.isArray(admins)){
-            admins.forEach((adminEmail) => {
-                sendEmail(
-                    adminEmail,
-                    EMAIL_PLACEHOLDERS.ADMIN_NOTIFICATION_SUBJECT,
-                    EMAIL_PLACEHOLDERS.ADMIN_NOTIFICATION_CONTENT
-                );
-            })
+        if (email_constants){
+            if (Array.isArray(admins)){
+                admins.forEach((adminEmail) => {
+                    sendEmail(
+                        adminEmail,
+                        email_constants.ADMIN_NOTIFICATION_SUBJECT,
+                        email_constants.ADMIN_NOTIFICATION_CONTENT
+                    );
+                })
+            }
+            else {
+                console.error('send email failed, admins parameter of sendAdminNotification is not an array');
+            }
         }
-        else {
-            console.error('send email failed, admins parameter of sendAdminNotification is not an array');
+        else{
+            console.error("Unable to load email constants from file, email not sent")
         }
+
     },
     sendRegistrationConfirmation: async (email) => {
-        sendEmail(
-            email,
-            EMAIL_PLACEHOLDERS.CONFIRMATION_SUBJECT,
-            EMAIL_PLACEHOLDERS.CONFIRMATION_CONTENT
-        );
+        if (email_constants) {
+            sendEmail(
+                email,
+                email_constants.CONFIRMATION_SUBJECT,
+                email_constants.CONFIRMATION_CONTENT
+            );
+        }
+        else{
+            console.error("Unable to load email constants from file, email not sent")
+        }
+
     },
     sendApprovalNotification: async (email) => {
-        sendEmail(
-            email,
-            EMAIL_PLACEHOLDERS.APPROVAL_SUBJECT,
-            EMAIL_PLACEHOLDERS.APPROVAL_CONTENT
-        );
+        if (email_constants) {
+            sendEmail(
+                email,
+                email_constants.APPROVAL_SUBJECT,
+                email_constants.APPROVAL_CONTENT
+            );
+        }
+        else{
+            console.error("Unable to load email constants from file, email not sent")
+        }
     },
     sendRejectionNotification: async (email, comment) => {
-        sendEmail(
-            email,
-            EMAIL_PLACEHOLDERS.REJECTION_SUBJECT,
-            EMAIL_PLACEHOLDERS.REJECTION_CONTENT1 + comment + EMAIL_PLACEHOLDERS.REJECTION_CONTENT2
-        );
+        if (email_constants) {
+            sendEmail(
+                email,
+                email_constants.REJECTION_SUBJECT,
+                email_constants.REJECTION_CONTENT_PRE_COMMENT + comment + email_constants.REJECTION_CONTENT_POST_COMMENT
+            );
+        }
+        else {
+            console.error("Unable to load email constants from file, email not sent")
+        }
     }
 }
