@@ -31,11 +31,11 @@ module.exports = graphqlHTTP((req, res) => {
         customFormatErrorFn: (error) => {
             try{
                 res.status(errorType[error.message].statusCode);
+                error.message = errorType[error.message].message;
             }
             catch(err){
                 res.status(500);
             }
-            error.message = errorType[error.message].message;
             return error;
         }
     }

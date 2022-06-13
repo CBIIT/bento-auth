@@ -2,9 +2,14 @@ const {v4} = require('uuid')
 const neo4j = require('./neo4j-service')
 const config = require('../config');
 const {errorName, valid_idps} = require("./graphql-api-constants");
+const {sendAdminNotification, sendRegistrationConfirmation, sendApprovalNotification, sendRejectionNotification} = require("./notifications");
 
 async function checkUnique(email, IDP){
     return await neo4j.checkUnique(IDP+":"+email);
+}
+
+async function getAdminEmails(){
+    return await neo4j.getAdminEmails();
 }
 
 // Sets userInfo in the session
@@ -100,7 +105,11 @@ const registerUser = async (input, context) => {
             ...input.userInfo,
             ...generatedInfo
         };
-        return neo4j.registerUser(registrationInfo);
+        let result = await neo4j.registerUser(registrationInfo);
+        let adminEmails = await getAdminEmails();
+        await sendAdminNotification(adminEmails);
+        await sendRegistrationConfirmation(input.userInfo.email)
+        return result;
     } catch (err) {
         return err;
     }
@@ -118,16 +127,24 @@ const updateMyUser = (input, context) => {
     }
 }
 
-const approveUser = (parameters, context) => {
+const approveUser = async (parameters, context) => {
     parameters.status = 'approved';
     let userInfo = context.session.userInfo;
-    return reviewUser(parameters, userInfo);
+    let result = await reviewUser(parameters, userInfo);
+    if (result.email){
+        await sendApprovalNotification(result.email);
+    }
+    return result;
 }
 
-const rejectUser = (parameters, context) => {
+const rejectUser = async (parameters, context) => {
     parameters.status = 'rejected';
     let userInfo = context.session.userInfo;
-    return reviewUser(parameters, userInfo);
+    let result = await reviewUser(parameters, userInfo);
+    if (result.email){
+        await sendRejectionNotification(result.email, result.comment);
+    }
+    return result;
 }
 
 async function reviewUser(parameters, userInfo) {
@@ -145,9 +162,7 @@ async function reviewUser(parameters, userInfo) {
             parameters.approvalDate = (new Date()).toString()
             let response = await neo4j.reviewUser(parameters)
             if (response) {
-                if (parameters.comment) {
-                    console.log(parameters.comment);
-                }
+                response.comment = parameters.comment;
                 return response;
             } else {
                 return new Error(errorName.USER_NOT_FOUND);

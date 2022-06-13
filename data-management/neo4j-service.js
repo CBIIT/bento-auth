@@ -3,6 +3,17 @@ const config = require('../config');
 const driver = neo4j.driver(config.NEO4J_URI, neo4j.auth.basic(config.NEO4J_USER, config.NEO4J_PASSWORD));
 
 //Queries
+async function getAdminEmails(){
+    const cypher =
+        `
+        MATCH (n:User)
+        WHERE n.role = 'admin' AND n.status = 'approved'
+        RETURN COLLECT(DISTINCT n.email) AS result
+    `
+    const result = await executeQuery({}, cypher, 'result');
+    return result[0];
+}
+
 async function checkUnique(key){
     let parameters = {key:key};
     const cypher =
@@ -182,3 +193,4 @@ exports.disableUser = disableUser
 exports.editUser = editUser
 exports.wipeDatabase = wipeDatabase
 exports.checkUnique = checkUnique
+exports.getAdminEmails = getAdminEmails
