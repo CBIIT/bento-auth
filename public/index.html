@@ -12,6 +12,7 @@
         function start() {
             gapi.load('auth2', function() {
                 auth2 = gapi.auth2.init({
+                    // TODO Add google client id
                     client_id: '',
                     // Scopes to request in addition to 'profile' and 'email'
                     //scope: 'additional_scope'
@@ -144,7 +145,8 @@
                     'Accept': 'application/json',
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({code: auth_code, type: 'NIH'})
+                // TODO register custom redirectUri into login provider
+                body: JSON.stringify({code: auth_code, type: 'NIH', redirectUri: "http://localhost:4010/profile"})
             })
                 .then(response => response.json())
                 .then((responseData) => {

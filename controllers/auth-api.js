@@ -4,7 +4,6 @@ const idpClient = require("../idps");
 
 exports.nihLogout = async (req, res) => {
     try {
-        // TODO add custom redirect url
         const response = await nodeFetch(config.nih.LOGOUT_URL, {
             method: 'POST',
             headers: {
@@ -67,8 +66,7 @@ exports.userInfo = async (accessToken) => {
 }
 
 exports.nihLogin = async (req, res) => {
-    const code  = req.body['code'];
-    const token = req.session.tokens ? req.session.tokens : await getNIHToken(code);
+    const token = req.session.tokens ? req.session.tokens : await getNIHToken(req);
     const user = await this.userInfo(token);
     req.session.tokens = token;
     res.send({ user });
@@ -82,9 +80,10 @@ exports.googleLogin = async (req, res) => {
     res.json({ name });
 }
 
-async function getNIHToken(auth_code) {
+async function getNIHToken(req) {
+    const auth_code  = req.body['code'];
+    const redirectUri  = req.body['redirectUri'];
 
-    // TODO add custom redirect url
     const response = await nodeFetch(config.nih.TOKEN_URL, {
         method: 'POST',
         headers: {
@@ -92,7 +91,7 @@ async function getNIHToken(auth_code) {
         },
         body: new URLSearchParams({
             code: auth_code,
-            redirect_uri: "http://localhost:4010/profile",
+            redirect_uri: redirectUri,
             grant_type: "authorization_code",
             client_id: config.nih.CLIENT_ID,
             client_secret: config.nih.CLIENT_SECRET,
