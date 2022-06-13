@@ -33,7 +33,7 @@ async function listUsers(parameters) {
     const cypher =
     `
         MATCH (user:User)
-        WHERE user.role = $role AND user.status = $status
+        WHERE user.role IN $role AND user.status IN $status
         return user 
     `
     const users = []
