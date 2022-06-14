@@ -1,5 +1,7 @@
 "use strict";
 const nodemailer = require("nodemailer");
+const config = require("../config");
+const {sendNotification} = require("../services/notify");
 
 module.exports = {
     /*
@@ -14,23 +16,13 @@ module.exports = {
      */
     sendEmail: async (recipient, subject, contents) => {
         // create reusable transporter object using the default SMTP transport
-        let transporter = nodemailer.createTransport({
-            host: config.mailerHost,
-            port: config.mailerPort,
-            secure: false, // true for 465, false for other ports
-            auth: {
-                user: config.mailerUser, // generated ethereal user
-                pass: config.mailerPassword, // generated ethereal password
-            },
-        });
-
-        // send mail with defined transport object
-        let info = await transporter.sendMail({
-            from: config.servericeEmail, // sender address
-            to: "ming.ying@nih.gov", // list of receivers
-            subject: "Hello ✔", // Subject line
-            text: "Hello world?", // plain text body
-            html: "<b>Hello world?</b>", // html body
+        let info = await sendNotification({
+            from: config.email.SERVICE_EMAIL,
+            to: recipient,
+            // cc: [],
+            // bcc: [],
+            subject: subject,
+            html: contents,
         });
 
         console.log("Message sent: %s", info.messageId);
@@ -39,6 +31,5 @@ module.exports = {
         // Preview only available when sending through an Ethereal account
         console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
         // Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
-
     }
 };

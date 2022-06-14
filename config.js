@@ -1,4 +1,6 @@
 const fs = require('fs');
+const dotenv = require('dotenv')
+dotenv.config();
 
 const config = {
   version: process.env.VERSION,
@@ -19,14 +21,27 @@ const config = {
   DATA_FILE: process.env.DATA_FILE,
   //Testing
   TEST_EMAIL: process.env.TEST_EMAIL,
-
   // Email settings
-  mailerHost: process.env.MAILER_HOST,
-  mailerPort: process.env.MAILER_PORT,
-  mailerUser: process.env.MAILER_USER,
-  mailerPassword: process.env.MAILER_PASSWORD,
-  serviceEmail: process.env.SERVICE_EMAIL,
+  email: JSON.parse(process.env.EMAIL),
+  email_transport: getTransportConfig()
 };
+
+function getTransportConfig() {
+  const config = JSON.parse(process.env.EMAIL);
+  return {
+    host: config.MAILER_HOST,
+    port: config.MAILER_PORT,
+    // Optional AWS Email Identity
+    ...(config.USER && {
+          secure: true, // true for 465, false for other ports
+          auth: {
+            user: config.USER, // generated ethereal user
+            pass: config.PASSWORD, // generated ethereal password
+          }
+        }
+    )
+  };
+}
 
 if (!config.version) {
   config.version = 'Version not set'

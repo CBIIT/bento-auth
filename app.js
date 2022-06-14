@@ -9,6 +9,7 @@ var logger = require('morgan');
 const fs = require('fs');
 const cors = require('cors');
 const config = require('./config');
+const notify = require("./routes/notification");
 console.log(config);
 
 const LOG_FOLDER = 'logs';
@@ -43,7 +44,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/api/auth', authRouter);
 app.use('/api/auth/graphql', graphql);
-
+app.use('/api', notify);
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));
