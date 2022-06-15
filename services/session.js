@@ -1,6 +1,7 @@
 const session = require('express-session');
 const {randomBytes} = require("crypto");
-const FileStore = require('session-file-store')(session)
+const config = require('../config');
+const MySQLStore = require('express-mysql-session')(session);
 
 function createSession({ sessionSecret, session_timeout } = {}) {
     sessionSecret = sessionSecret || randomBytes(16).toString("hex");
@@ -9,7 +10,15 @@ function createSession({ sessionSecret, session_timeout } = {}) {
         // rolling: true,
         saveUninitialized: false,
         resave: true,
-        store: new FileStore({ttl: session_timeout, reapInterval: 10}),
+        store: new MySQLStore({
+          host: config.mysql.HOST,
+          port: config.mysql.PORT,
+          user: config.mysql.USER,
+          password: config.mysql.PASSWORD,
+          database: config.mysql.DATABASE,
+          checkExpirationInterval: 10,
+          expiration: session_timeout
+        })
     });
 }
 
