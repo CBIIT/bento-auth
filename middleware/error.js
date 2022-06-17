@@ -27,8 +27,31 @@ function createLogStream(dirName) {
     const accessLogStream = fs.createWriteStream(path.join(dirName, LOG_FOLDER, 'access.log'), { flags: 'a'})
     return logger('combined', { stream: accessLogStream });
 }
+
+function withAsync(fn) {
+    return async (request, response, next) => {
+        try {
+            return await fn(request, response, next);
+        } catch (error) {
+            next(error);
+        }
+    };
+}
+
+function withSync(fn) {
+    return async (request, response, next) => {
+        try {
+            return await fn(request, response, next);
+        } catch (error) {
+            next(error);
+        }
+    };
+}
+
 module.exports = {
     errorHandler,
     throwError,
-    createLogStream
+    createLogStream,
+    withAsync,
+    withSync
 };
