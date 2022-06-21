@@ -11,6 +11,8 @@ type User {
     userID: ID
     registrationDate: String
     approvalDate: String
+    rejectionDate: String
+    comment: String
     editDate: String
     "admin or standard"
     role: String
@@ -50,8 +52,8 @@ type Mutation {
 
     "Admin only operations"
     approveUser (userID: ID!, role: String = "standard"): User
-    rejectUser (userID: ID!, comment: String = ""): User
+    rejectUser (userID: ID!, comment: String = "No comment provided"): User
     deleteUser (userID: ID!): User
     disableUser (userID: ID!): User
-    editUser(userID: ID!, role: String, status: String, organization: String, acl: [String]): User
+    editUser(userID: ID!, role: String, status: String, organization: String, acl: [String], comment: String = "No comment provided"): User
 }

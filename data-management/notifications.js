@@ -68,5 +68,17 @@ module.exports = {
         else {
             console.error("Unable to load email constants from file, email not sent")
         }
+    },
+    sendEditNotification: async (email, comment) => {
+        if (email_constants) {
+            sendEmail(
+                email,
+                email_constants.EDIT_SUBJECT,
+                email_constants.EDIT_CONTENT_PRE_COMMENT + comment + email_constants.EDIT_CONTENT_POST_COMMENT
+            );
+        }
+        else {
+            console.error("Unable to load email constants from file, email not sent")
+        }
     }
 }

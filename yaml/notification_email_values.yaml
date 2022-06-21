@@ -8,3 +8,6 @@ APPROVAL_CONTENT: "Thank you for your interest in Bento Software, your account h
 REJECTION_SUBJECT: "Bento account rejected"
 REJECTION_CONTENT_PRE_COMMENT: "Thank you for your interest in Bento Software, your account has been rejected according to the following criteria: "
 REJECTION_CONTENT_POST_COMMENT: ". For further assistance please contact the Bento help desk at bento-help@nih.gov"
+EDIT_SUBJECT: "Bento account edited"
+EDIT_CONTENT_PRE_COMMENT: "Your Bento account has been edited with the following explanation: "
+EDIT_CONTENT_POST_COMMENT: ". If further assistance is required, please contact the Bento help desk at bento-help@nih.gov"
