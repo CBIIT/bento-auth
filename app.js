@@ -1,4 +1,3 @@
-const newrelic = require('newrelic');
 const graphql = require("./data-management/init-graphql");
 var createError = require('http-errors');
 var express = require('express');
@@ -8,6 +7,9 @@ var FileStore = require('session-file-store')(session);
 var logger = require('morgan');
 const fs = require('fs');
 const cors = require('cors');
+const authRouter = require('./routes/auth');
+const healthRouter = require('./routes/healthcheck');
+const {createSession} = require("./services/session");
 const config = require('./config');
 console.log(config);
 
@@ -20,8 +22,6 @@ if (!fs.existsSync(LOG_FOLDER)) {
 // create a write stream (in append mode)
 const accessLogStream = fs.createWriteStream(path.join(__dirname, LOG_FOLDER, 'access.log'), { flags: 'a'})
 
-var authRouter = require('./routes/auth');
-
 var app = express();
 app.use(cors());
 
@@ -29,8 +29,8 @@ app.use(cors());
 app.use(logger('combined', { stream: accessLogStream }))
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-
-
+// Set Session Storage
+app.use(createSession({ session_timeout: config.session_timeout }))
 var fileStoreOptions = {ttl: config.session_timeout, reapInterval: 10};
 
 app.use(session({
@@ -42,6 +42,7 @@ app.use(session({
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/api/auth', authRouter);
+app.use('/api/auth', healthRouter);
 app.use('/api/auth/graphql', graphql);
 
 // catch 404 and forward to error handler
