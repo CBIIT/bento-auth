@@ -3,14 +3,8 @@ const {getNIHToken, nihUserInfo, nihLogout} = require("../services/auth");
 const client = {
     login: async (code, redirectingURL) => {
         const token = await getNIHToken(code, redirectingURL);
-        const user = await this.userInfo(token);
+        const user = await nihUserInfo(token);
         return {name: user.name, email: user.email, tokens: token};
-    },
-    userInfo: async (tokens) => {
-        // @Austin
-        // TODO Database access logic after login success
-        const response = await nihUserInfo(tokens);
-        return await response.json();
     },
     authenticated: async (tokens) => {
         try {

@@ -1,3 +1,6 @@
+// TODO DELETE DOTENV
+const dotenv = require('dotenv')
+dotenv.config();
 const config = {
   version: process.env.VERSION,
   date: process.env.DATE,

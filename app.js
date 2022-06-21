@@ -44,7 +44,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/api/auth', authRouter);
 app.use('/api/auth', healthRouter);
 app.use('/api/auth/graphql', graphql);
-
+const nihRouter = require('./routes/nih-auth')();
+app.use(nihRouter);
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));

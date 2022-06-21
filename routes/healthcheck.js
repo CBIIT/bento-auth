@@ -1,4 +1,3 @@
-const { ping, version } = require('../controllers/healthcheck')
 const express = require('express');
 const config = require("../config");
 const router = express.Router();

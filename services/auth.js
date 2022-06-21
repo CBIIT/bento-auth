@@ -39,7 +39,7 @@ async function nihUserInfo(accessToken) {
             'Authorization': `Bearer ` + accessToken
         }
     });
-    return result;
+    return result.json();
 }
 
 module.exports = {
