@@ -1,10 +1,17 @@
 const {v4} = require('uuid')
 const neo4j = require('./neo4j-service')
 const config = require('../config');
-const {errorName, valid_idps, errorType} = require("./graphql-api-constants");
+const {errorName, valid_idps} = require("./graphql-api-constants");
+const {sendAdminNotification, sendRegistrationConfirmation, sendApprovalNotification, sendRejectionNotification,
+    sendEditNotification
+} = require("./notifications");
 
 async function checkUnique(email, IDP){
     return await neo4j.checkUnique(IDP+":"+email);
+}
+
+async function getAdminEmails(){
+    return await neo4j.getAdminEmails();
 }
 
 // Sets userInfo in the session
@@ -39,7 +46,7 @@ function checkAdminPermissions(userInfo) {
 }
 
 function checkStandardPermissions(userInfo) {
-    return checkApproved(userInfo) && userInfo.role === 'standard';
+    return checkApproved(userInfo) && (userInfo.role === 'standard' || userInfo.role === 'admin');
 }
 
 function checkApproved(userInfo) {
@@ -110,53 +117,36 @@ const registerUser = async (input, context) => {
             ...input.userInfo,
             ...generatedInfo
         };
-        return neo4j.registerUser(registrationInfo);
+        let result = await neo4j.registerUser(registrationInfo);
+        let adminEmails = await getAdminEmails();
+        await sendAdminNotification(adminEmails);
+        await sendRegistrationConfirmation(input.userInfo.email)
+        return result;
     } catch (err) {
         return err;
     }
 }
 
-const updateMyUser = (input, context) => {
-    try{
-        let userInfo = context.session.userInfo;
-        input.userInfo.email = userInfo.email;
-        input.userInfo.editDate = (new Date()).toString();
-        return neo4j.updateMyUser(input.userInfo);
-    }
-    catch (err) {
-        return err;
-    }
-}
 
-const approveUser = (parameters, context) => {
-    parameters.status = 'approved';
-    let userInfo = context.session.userInfo;
-    return reviewUser(parameters, userInfo);
-}
-
-const rejectUser = (parameters, context) => {
-    parameters.status = 'rejected';
-    let userInfo = context.session.userInfo;
-    return reviewUser(parameters, userInfo);
-}
-
-async function reviewUser(parameters, userInfo) {
+const approveUser = async (parameters, context) => {
     try {
-        //Check if not logged in
+        let userInfo = context.session.userInfo;
+        parameters.role = parameters.role.toLowerCase();
         if (!userInfo) {
             return new Error(errorName.NOT_LOGGED_IN);
-        }
-        //Check if not admin
-        else if (!checkAdminPermissions(userInfo)) {
+        } else if (!checkAdminPermissions(userInfo)) {
             return new Error(errorName.NOT_AUTHORIZED);
+        } else if (await neo4j.checkAlreadyApproved(parameters.userID)) {
+            return new Error(errorName.ALREADY_APPROVED);
+        } else if (!(parameters.role === 'admin' || parameters.role === 'standard')){
+            return new Error(errorName.INVALID_ROLE);
         }
-        //Execute query
         else {
             parameters.approvalDate = (new Date()).toString()
-            let response = await neo4j.reviewUser(parameters)
+            let response = await neo4j.approveUser(parameters)
             if (response) {
-                if (parameters.comment) {
-                    console.log(parameters.comment);
+                if (response.email) {
+                    await sendApprovalNotification(response.email);
                 }
                 return response;
             } else {
@@ -168,60 +158,142 @@ async function reviewUser(parameters, userInfo) {
     }
 }
 
-const deleteUser = (parameters, context) => {
-    try{
+
+const rejectUser = async (parameters, context) => {
+    try {
         let userInfo = context.session.userInfo;
-        if (checkAdminPermissions(userInfo)) {
-            return neo4j.deleteUser(parameters)
+        if (!userInfo) {
+            return new Error(errorName.NOT_LOGGED_IN);
+        } else if (!checkAdminPermissions(userInfo)) {
+            return new Error(errorName.NOT_AUTHORIZED);
+        } else if (await neo4j.checkAlreadyRejected(parameters.userID)) {
+            return new Error(errorName.ALREADY_REJECTED);
+        } else {
+            parameters.rejectionDate = (new Date()).toString()
+            let response = await neo4j.rejectUser(parameters)
+            if (response) {
+                if (response.email) {
+                    await sendRejectionNotification(response.email, response.comment);
+                }
+                return response;
+            } else {
+                return new Error(errorName.USER_NOT_FOUND);
+            }
         }
-        else{
-            new Error(errorName.NOT_AUTHORIZED)
-        }
-    }
-    catch (err) {
+    } catch (err) {
         return err;
     }
 }
 
-const disableUser = (parameters, context) => {
-    try{
+
+const editUser = async (parameters, context) => {
+    try {
         let userInfo = context.session.userInfo;
-        if (checkAdminPermissions(userInfo)) {
-            return neo4j.disableUser(parameters)
+        if (!userInfo) {
+            return new Error(errorName.NOT_LOGGED_IN);
+        } else if (!checkAdminPermissions(userInfo)) {
+            return new Error(errorName.NOT_AUTHORIZED);
         }
-        else{
-            new Error(errorName.NOT_AUTHORIZED)
+        else {
+            if (parameters.role) {
+                parameters.role = parameters.role.toLowerCase();
+                if (!(parameters.role === 'admin' || parameters.role === 'standard')){
+                    return new Error(errorName.INVALID_ROLE);
+                }
+            }
+            if (parameters.status) {
+                parameters.status = parameters.status.toLowerCase();
+                if (!(parameters.status === 'approved' || parameters.status === 'rejected' || parameters.status === 'registered')){
+                    return new Error(errorName.INVALID_STATUS);
+                }
+            }
+            parameters.editDate = (new Date()).toString()
+            if (parameters.status === 'approved') {
+                parameters.approvalDate = parameters.editDate
+                let response = await neo4j.approveUser(parameters)
+                if (!response) {
+                    return new Error(errorName.USER_NOT_FOUND);
+                }
+            }
+            else if (parameters.status === 'rejected') {
+                parameters.rejectionDate = parameters.editDate
+                let response = await neo4j.rejectUser(parameters)
+                if (!response) {
+                    return new Error(errorName.USER_NOT_FOUND);
+                }
+            }
+            else if (parameters.status === 'registered') {
+                let response = await neo4j.resetApproval(parameters)
+                if (!response) {
+                    return new Error(errorName.USER_NOT_FOUND);
+                }
+            }
+            let response = await neo4j.editUser(parameters)
+            if (response) {
+                if (response.email) {
+                    await sendEditNotification(response.email, response.comment);
+                }
+                return response;
+            } else {
+                return new Error(errorName.USER_NOT_FOUND);
+            }
         }
-    }
-    catch (err) {
+    } catch (err) {
         return err;
     }
 }
 
-const editUser = (parameters, context) => {
-    try{
-        let userInfo = context.session.userInfo;
-        if (checkAdminPermissions(userInfo)) {
-            return neo4j.editUser(parameters)
-        }
-        else{
-            new Error(errorName.NOT_AUTHORIZED)
-        }
-    }
-    catch (err) {
-        return err;
-    }
-}
+// const updateMyUser = (input, context) => {
+//     try{
+//         let userInfo = context.session.userInfo;
+//         input.userInfo.email = userInfo.email;
+//         input.userInfo.editDate = (new Date()).toString();
+//         return neo4j.updateMyUser(input.userInfo);
+//     }
+//     catch (err) {
+//         return err;
+//     }
+// }
+// const deleteUser = (parameters, context) => {
+//     try{
+//         let userInfo = context.session.userInfo;
+//         if (checkAdminPermissions(userInfo)) {
+//             return neo4j.deleteUser(parameters)
+//         }
+//         else{
+//             new Error(errorName.NOT_AUTHORIZED)
+//         }
+//     }
+//     catch (err) {
+//         return err;
+//     }
+// }
+//
+// const disableUser = (parameters, context) => {
+//     try{
+//         let userInfo = context.session.userInfo;
+//         if (checkAdminPermissions(userInfo)) {
+//             return neo4j.disableUser(parameters)
+//         }
+//         else{
+//             new Error(errorName.NOT_AUTHORIZED)
+//         }
+//     }
+//     catch (err) {
+//         return err;
+//     }
+// }
+
 
 module.exports = {
     getMyUser: getMyUser,
     listUsers: listUsers,
     registerUser: registerUser,
-    updateMyUser: updateMyUser,
     approveUser: approveUser,
     rejectUser: rejectUser,
-    deleteUser: deleteUser,
-    disableUser: disableUser,
     editUser: editUser,
     getUserSessionData: getUserSessionData,
+    // updateMyUser: updateMyUser,
+    // deleteUser: deleteUser,
+    // disableUser: disableUser,
 }

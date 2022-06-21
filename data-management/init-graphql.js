@@ -13,11 +13,11 @@ const root = {
     registerUser: data_interface.registerUser,
     approveUser: data_interface.approveUser,
     rejectUser: data_interface.rejectUser,
+    editUser: data_interface.editUser,
     // The below functions are not fully tested and verified yet and should not be used
     // updateMyUser: data_interface.updateMyUser,
     // deleteUser: data_interface.deleteUser,
     // disableUser: data_interface.disableUser,
-    // editUser: data_interface.editUser,
 };
 
 module.exports = graphqlHTTP((req, res) => {
@@ -29,13 +29,12 @@ module.exports = graphqlHTTP((req, res) => {
             session: req.session
         },
         customFormatErrorFn: (error) => {
-            try{
+            try {
                 res.status(errorType[error.message].statusCode);
-            }
-            catch(err){
+                error.message = errorType[error.message].message;
+            } catch (err) {
                 res.status(500);
             }
-            error.message = errorType[error.message].message;
             return error;
         }
     }

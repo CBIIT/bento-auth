@@ -11,6 +11,8 @@ type User {
     userID: ID
     registrationDate: String
     approvalDate: String
+    rejectionDate: String
+    comment: String
     editDate: String
     "admin or standard"
     role: String
@@ -37,7 +39,7 @@ input UpdateUserInput {
 
 type Query {
     "Admin only"
-    listUsers(role: String = "standard", status: String = "registered"): [User]
+    listUsers(role: [String] = ["standard"], status: [String] = ["registered"]): [User]
     "Limit to current user only"
     getMyUser : User
 }
@@ -45,13 +47,13 @@ type Query {
 type Mutation {
     "User initiated operations"
     registerUser (userInfo: RegisterUserInput!): User
-    "Limit to current user only"
-    updateMyUser (userInfo: UpdateUserInput!): User
+#   "Limit to current user only"
+#    updateMyUser (userInfo: UpdateUserInput!): User
 
     "Admin only operations"
     approveUser (userID: ID!, role: String = "standard"): User
-    rejectUser (userID: ID!, comment: String = ""): User
-    deleteUser (userID: ID!): User
-    disableUser (userID: ID!): User
-    editUser(userID: ID!, role: String, status: String, organization: String, acl: [String]): User
+    rejectUser (userID: ID!, comment: String = "No comment provided"): User
+    editUser(userID: ID!, role: String, status: String, organization: String, acl: [String], comment: String = "No comment provided"): User
+#    deleteUser (userID: ID!): User
+#    disableUser (userID: ID!): User
 }
