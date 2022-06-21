@@ -1,7 +1,7 @@
 const {v4} = require('uuid')
 const neo4j = require('./neo4j-service')
 const config = require('../config');
-const {errorName, valid_idps} = require("./graphql-api-constants");
+const {errorName, valid_idps, errorType} = require("./graphql-api-constants");
 const {sendAdminNotification, sendRegistrationConfirmation, sendApprovalNotification, sendRejectionNotification,
     sendEditNotification
 } = require("./notifications");
