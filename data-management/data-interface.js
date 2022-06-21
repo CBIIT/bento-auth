@@ -117,17 +117,6 @@ const registerUser = async (input, context) => {
     }
 }
 
-const updateMyUser = (input, context) => {
-    try{
-        let userInfo = context.session.userInfo;
-        input.userInfo.email = userInfo.email;
-        input.userInfo.editDate = (new Date()).toString();
-        return neo4j.updateMyUser(input.userInfo);
-    }
-    catch (err) {
-        return err;
-    }
-}
 
 const approveUser = async (parameters, context) => {
     try {
@@ -244,7 +233,17 @@ const editUser = async (parameters, context) => {
     }
 }
 
-
+// const updateMyUser = (input, context) => {
+//     try{
+//         let userInfo = context.session.userInfo;
+//         input.userInfo.email = userInfo.email;
+//         input.userInfo.editDate = (new Date()).toString();
+//         return neo4j.updateMyUser(input.userInfo);
+//     }
+//     catch (err) {
+//         return err;
+//     }
+// }
 // const deleteUser = (parameters, context) => {
 //     try{
 //         let userInfo = context.session.userInfo;
@@ -280,11 +279,11 @@ module.exports = {
     getMyUser: getMyUser,
     listUsers: listUsers,
     registerUser: registerUser,
-    updateMyUser: updateMyUser,
     approveUser: approveUser,
     rejectUser: rejectUser,
     editUser: editUser,
     getUserSessionData: getUserSessionData,
+    // updateMyUser: updateMyUser,
     // deleteUser: deleteUser,
     // disableUser: disableUser,
 }

@@ -47,8 +47,8 @@ type Query {
 type Mutation {
     "User initiated operations"
     registerUser (userInfo: RegisterUserInput!): User
-    "Limit to current user only"
-    updateMyUser (userInfo: UpdateUserInput!): User
+#   "Limit to current user only"
+#    updateMyUser (userInfo: UpdateUserInput!): User
 
     "Admin only operations"
     approveUser (userID: ID!, role: String = "standard"): User
