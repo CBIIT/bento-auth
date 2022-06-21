@@ -17,7 +17,7 @@ module.exports = {
     sendEmail: async (recipient, subject, contents) => {
         // create reusable transporter object using the default SMTP transport
         let info = await sendNotification({
-            from: config.email.SERVICE_EMAIL,
+            from: config.email_service_email,
             to: recipient,
             // cc: [],
             // bcc: [],
