@@ -1,7 +1,7 @@
 const idpClient = require("../idps");
 const {authFileWithACL} = require("../services/file-auth");
-const {getNIHToken, nihLogout, nihUserInfo} = require("../services/auth");
-
+const {nihLogout} = require("../services/auth");
+const nihClient = require('./nih');
 exports.nihLogout = async (req, res) => {
     const response = await nihLogout(req);
     const jsonRes = await response.json();
@@ -40,20 +40,14 @@ exports.authenticated = (req, res) => {
     return res.status(200).send({status: false});
 }
 
-exports.userInfo = async (accessToken) => {
-    const response = await nihUserInfo(accessToken);
-    return await response.json();
-}
-
 exports.nihLogin = async (req, res) => {
-    const token = req.session.tokens ? req.session.tokens : await getNIHToken(req);
-    const user = await this.userInfo(token);
+    const result = req.session.tokens ? req.session.tokens : await nihClient(req.body['code'], req.body['redirectUri']);
     // @Austin
     // TODO Database access logic after login success
     // Store email address or any identity
     // TODO temporary acl values
-    req.session.userInfo = {idp: "NIH", email: user.email, acl: ["Open"]}
-    req.session.tokens = token;
+    req.session.userInfo = {idp: "NIH", email: result.user.email, acl: ["Open"]}
+    req.session.tokens = result.tokens;
     res.send({ user });
 }
 

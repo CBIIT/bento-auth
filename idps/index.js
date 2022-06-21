@@ -1,13 +1,30 @@
-const config = require('../config');
 const googleClient = require('./google');
+const nihClient = require('./nih');
 
-let oauth2Client;
-switch (config.idp) {
-    case 'fence':
-        oauth2Client = null;
-    case 'google':
-    default:
-        oauth2Client = googleClient;
+let oauth2Client = {
+    login: async (code, type, redirectingURL) => {
+        // if google
+        if (type === 'google') {
+            return googleClient.login(code);
+        } else if (type === 'NIH') {
+            return nihClient.login(code, redirectingURL);
+        }
+        // TODO Login.gov
+    },
+    authenticated: async (tokens) => {
+        if (type === 'google') {
+            return googleClient.authenticated(tokens);
+        } else if (type === 'NIH') {
+            return nihClient.authenticated(tokens);
+        }
+        // TODO Login.gov
+    },
+    logout: async(type, tokens) => {
+        if (type === 'NIH') {
+            return nihClient.logout(tokens);
+        }
+        // TODO Login.gov
+    }
 }
 
 module.exports = oauth2Client;

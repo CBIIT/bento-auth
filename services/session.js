@@ -11,13 +11,13 @@ function createSession({ sessionSecret, session_timeout } = {}) {
         saveUninitialized: false,
         resave: true,
         store: new MySQLStore({
-          host: config.mysql.HOST,
-          port: config.mysql.PORT,
-          user: config.mysql.USER,
-          password: config.mysql.PASSWORD,
-          database: config.mysql.DATABASE,
-          checkExpirationInterval: 10,
-          expiration: session_timeout
+            host: config.mysql_host,
+            port: config.mysql_port,
+            user: config.mysql_user,
+            password: config.mysql_password,
+            database: config.mysql_database,
+            checkExpirationInterval: 10,
+            expiration: session_timeout
         })
     });
 }

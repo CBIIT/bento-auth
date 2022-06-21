@@ -4,7 +4,6 @@ const url = require('url');
 const config = require('../config');
 
 module.exports = ()=> {
-
     // TODO ADD Custom Redirect URL
     router.get(
         '/nih_external_login',
