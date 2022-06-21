@@ -136,6 +136,25 @@ async function rejectUser(parameters) {
     return;
 }
 
+async function resetApproval(parameters) {
+    const cypher =
+        `
+        MATCH (user:User)
+        WHERE 
+            user.userID = $userID
+        SET user.status = 'registered'
+        SET user.rejectionDate = Null
+        SET user.approvalDate = Null
+        SET user.comment = Null
+        RETURN user
+    `
+    const result = await executeQuery(parameters, cypher, 'user');
+    if (result && result[0]) {
+        return result[0].properties;
+    }
+    return;
+}
+
 async function editUser(parameters) {
     const cypher =
         `
@@ -233,6 +252,7 @@ exports.checkUnique = checkUnique
 exports.getAdminEmails = getAdminEmails
 exports.checkAlreadyApproved = checkAlreadyApproved
 exports.checkAlreadyRejected = checkAlreadyRejected
+exports.resetApproval = resetApproval
 // exports.deleteUser = deleteUser
 // exports.disableUser = disableUser
 // exports.updateMyUser = updateMyUser

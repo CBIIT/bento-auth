@@ -223,6 +223,12 @@ const editUser = async (parameters, context) => {
                     return new Error(errorName.USER_NOT_FOUND);
                 }
             }
+            else if (parameters.status === 'registered') {
+                let response = await neo4j.resetApproval(parameters)
+                if (!response) {
+                    return new Error(errorName.USER_NOT_FOUND);
+                }
+            }
             let response = await neo4j.editUser(parameters)
             if (response) {
                 if (response.email) {

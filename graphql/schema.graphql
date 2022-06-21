@@ -53,7 +53,7 @@ type Mutation {
     "Admin only operations"
     approveUser (userID: ID!, role: String = "standard"): User
     rejectUser (userID: ID!, comment: String = "No comment provided"): User
-    deleteUser (userID: ID!): User
-    disableUser (userID: ID!): User
     editUser(userID: ID!, role: String, status: String, organization: String, acl: [String], comment: String = "No comment provided"): User
+#    deleteUser (userID: ID!): User
+#    disableUser (userID: ID!): User
 }
