@@ -1,5 +1,6 @@
 const googleClient = require('./google');
 const nihClient = require('./nih');
+const {authFileWithACL} = require("../services/file-auth");
 
 const oauth2Client = {
     login: async (code, type, redirectingURL) => {
@@ -11,10 +12,13 @@ const oauth2Client = {
         }
         // TODO Login.gov
     },
-    authenticated: async (type, tokens) => {
-        if (type === 'google') {
+    authenticated: async (userSession, tokens, fileAcl) => {
+        // Validate File ACL in User ACL
+        if (!authFileWithACL(userSession.acl, fileAcl)) return false;
+        // Check Valid Token
+        if (userSession.type === 'google') {
             return googleClient.authenticated(tokens);
-        } else if (type === 'NIH') {
+        } else if (userSession.type === 'NIH') {
             return nihClient.authenticated(tokens);
         }
         // TODO Login.gov
@@ -26,6 +30,5 @@ const oauth2Client = {
         // TODO Login.gov
     }
 }
-
 
 module.exports = oauth2Client;

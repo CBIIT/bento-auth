@@ -3,7 +3,7 @@ const router = express.Router();
 const idpClient = require('../idps');
 const config = require('../config');
 const {getUserSessionData} = require("../data-management/data-interface");
-
+const axios = require('axios');
 
 /* Login */
 router.post('/login', async function(req, res, next) {
@@ -16,7 +16,9 @@ router.post('/login', async function(req, res, next) {
     // @Austin TODO USER SESSION
     req.session.userInfo = {idp: req.body['type'], email: email, acl: ["Open"]}
     req.session.tokens = tokens;
-    await getUserSessionData(req.session, email)
+
+    // TODO Add ACL SESSION
+    await getUserSessionData(req.session, email);
     res.json({ name });
   } catch (e) {
     console.log(e);
@@ -55,14 +57,26 @@ router.post('/logout', async function(req, res, next) {
 // Calling this API will refresh the session
 router.post('/authenticated', async function(req, res, next) {
   try {
-    if (req.session.tokens) {
-      return res.status(200).send({status: true});
-    } else {
-      return res.status(200).send({status: false});
+    let status = false;
+    if (req.session.tokens && req.session.userInfo && req.headers.acl) {
+      status = await idpClient.authenticated(req.session.userInfo, req.session.tokens,req.headers.acl);
     }
+    return res.status(200).send({status: status});
   } catch (e) {
     console.log(e);
     res.status(500).json({errors: e});
   }
 });
+
+/* TODO Temporary redirect file download request to avoid CORS issue */
+router.get('/files/:fileId', async function(req, res, next) {
+  const fileId = req.params.fileId;
+  const result = await axios.get('http://localhost:3000/api/files/' + fileId, {
+    headers: {
+      Cookie: req.headers.cookie
+    }
+  });
+  res.json(result.data);
+});
+
 module.exports = router;

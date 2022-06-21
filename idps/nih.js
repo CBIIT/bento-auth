@@ -12,7 +12,7 @@ const client = {
                 console.log('No tokens found!');
                 return false
             }
-            await this.userInfo(tokens);
+            await nihUserInfo(tokens);
             return true;
 
         } catch (e) {
