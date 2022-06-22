@@ -11,12 +11,16 @@ router.post('/login', async function(req, res, next) {
     const code = req.body['code'];
     const { name, tokens, email } = await idpClient.login(code);
     req.session.tokens = tokens;
-    await getUserSessionData(req.session, email)
+    if (config.authorization_enabled) {
+      await getUserSessionData(req.session, email)
+    }
     res.json({ name, email });
   } catch (e) {
     console.log(e);
     if (e.code && parseInt(e.code)) {
       res.status(e.code);
+    } else if (e.statusCode && parseInt(e.statusCode)) {
+      res.status(e.statusCode);
     } else {
       res.status(500);
     }
