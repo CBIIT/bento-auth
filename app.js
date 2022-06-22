@@ -3,8 +3,7 @@ const graphql = require("./data-management/init-graphql");
 var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
-var session = require('express-session');
-var FileStore = require('session-file-store')(session);
+const {createSession} = require("./services/session");
 var logger = require('morgan');
 const fs = require('fs');
 const cors = require('cors');
@@ -21,7 +20,6 @@ if (!fs.existsSync(LOG_FOLDER)) {
 const accessLogStream = fs.createWriteStream(path.join(__dirname, LOG_FOLDER, 'access.log'), { flags: 'a'})
 
 var authRouter = require('./routes/auth');
-
 var app = express();
 app.use(cors());
 
@@ -29,21 +27,12 @@ app.use(cors());
 app.use(logger('combined', { stream: accessLogStream }))
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-
-
-var fileStoreOptions = {ttl: config.session_timeout, reapInterval: 10};
-
-app.use(session({
-  secret: config.cookie_secret,
-  rolling: true,
-  store: new FileStore(fileStoreOptions),
-}));
+app.use(createSession({ session_timeout: config.session_timeout }));
 
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/api/auth', authRouter);
 app.use('/api/auth/graphql', graphql);
-
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));
