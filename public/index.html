@@ -83,7 +83,7 @@
                             'Content-Type': 'application/json',
                             'Login-Type': 'google'
                         },
-                        body: JSON.stringify({code: authResult['code']})
+                        body: JSON.stringify({code: authResult['code'], type: 'google'})
                     });
                     const content = await rawResponse.json();
                     console.log(content);
