@@ -12,6 +12,7 @@ const client = {
                 console.log('No tokens found!');
                 return false
             }
+            // If not passing, throw error
             await nihUserInfo(tokens);
             return true;
 
