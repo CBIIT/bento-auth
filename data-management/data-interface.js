@@ -29,11 +29,13 @@ async function getUserSessionData(session, email) {
         if (result.role){
             session.userInfo.role = result.role;
         }
+        if (result.firstName && result.lastName){
+            session.userInfo.name = `${result.firstName} ${result.lastName}`;
+        }
         // IDP stored in user table
         if (result.IDP){
             session.userInfo.idp = result.IDP;
         }
-
         if (result.acl){
             session.userInfo.acl = result.acl;
         }
