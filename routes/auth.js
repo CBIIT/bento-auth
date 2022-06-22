@@ -5,6 +5,7 @@ const {getUserSessionData} = require("../data-management/data-interface");
 const axios = require('axios');
 const {logout} = require('../controllers/auth-api')
 const {withAsync} = require("../middleware/middlewares");
+const config = require("../config");
 function getUserSession(session) {
   return {name: session.userInfo.name, email: session.userInfo.email, tokens: session.tokens}
 }
@@ -14,8 +15,6 @@ router.post('/login', async function(req, res, next) {
     const { name, tokens, email } = (req.session.userInfo && req.session.userInfo.email) ? getUserSession(req.session) : await idpClient.login(req.body['code'], req.body['type'], req.body['redirectUri']);
     req.session.tokens = tokens;
     // Set User Session Including ACL property
-    await getUserSessionData(req.session, email);
-    res.json({ name });
     if (config.authorization_enabled) {
       await getUserSessionData(req.session, email)
     }
