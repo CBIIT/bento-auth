@@ -3,7 +3,7 @@ const router = express.Router();
 const idpClient = require('../idps');
 const config = require('../config');
 const {getUserSessionData} = require("../data-management/data-interface");
-
+const {logout} = require('../controllers/auth-api')
 
 /* Login */
 router.post('/login', async function(req, res, next) {
@@ -28,17 +28,9 @@ router.post('/login', async function(req, res, next) {
 /* Logout */
 router.post('/logout', async function(req, res, next) {
   try {
-    if (req.session) {
-      req.session.destroy( (err) => {
-        if (err) {
-          console.log(err);
-          return res.status(500).send({errors: err});
-        }
-        res.status(200).send({status: 'success'});
-      });
-    } else {
-      return res.status(200).send({status: 'success'});
-    }
+    await idpClient.logout(req.body['type'], req.session.tokens);
+    // Remove User Session
+    return logout(req, res);
   } catch (e) {
     console.log(e);
     res.status(500).json({errors: e});
