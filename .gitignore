@@ -1,4 +1,5 @@
-
+# TODO public directory testing purpose
+#public/
 node_modules/
 sessions/
 .idea/

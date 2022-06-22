@@ -9,6 +9,7 @@ const fs = require('fs');
 const cors = require('cors');
 const authRouter = require('./routes/auth');
 const healthRouter = require('./routes/healthcheck');
+const nihRouter = require('./routes/nih-auth')();
 const {createSession} = require("./services/session");
 const config = require('./config');
 console.log(config);
@@ -44,7 +45,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/api/auth', authRouter);
 app.use('/api/auth', healthRouter);
 app.use('/api/auth/graphql', graphql);
-const nihRouter = require('./routes/nih-auth')();
+// TODO NIH ROUTER TESTING PURPOSE TOBE DELETED
 app.use(nihRouter);
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
