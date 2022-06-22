@@ -8,9 +8,6 @@ const {withAsync} = require("../middleware/middlewares");
 
 /* Login */
 router.post('/login', async function(req, res, next) {
-  function getUserSession(session) {
-    return {name: session.userInfo.name, email: session.userInfo.email, tokens: session.tokens}
-  }
   try {
     const { name, tokens, email } = (req.session && req.session.userInfo) ? getUserSession(req.session) : await idpClient.login(req.body['code'], req.body['type'], req.body['redirectUri']);
     req.session.tokens = tokens;
