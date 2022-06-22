@@ -1,3 +1,4 @@
+const newrelic = require('newrelic');
 const graphql = require("./data-management/init-graphql");
 var createError = require('http-errors');
 var express = require('express');
@@ -7,7 +8,6 @@ var logger = require('morgan');
 const fs = require('fs');
 const cors = require('cors');
 const config = require('./config');
-const notify = require("./routes/notification");
 console.log(config);
 
 const LOG_FOLDER = 'logs';
