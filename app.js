@@ -1,3 +1,4 @@
+const newrelic = require('newrelic');
 const graphql = require("./data-management/init-graphql");
 var createError = require('http-errors');
 var express = require('express');
