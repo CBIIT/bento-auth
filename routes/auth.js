@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const idpClient = require('../idps');
-const config = require('../config');
 const {getUserSessionData} = require("../data-management/data-interface");
 const axios = require('axios');
+const {logout} = require('../controllers/auth-api')
 
 /* Login */
 router.post('/login', async function(req, res, next) {
@@ -12,12 +12,8 @@ router.post('/login', async function(req, res, next) {
   }
   try {
     const { name, tokens, email } = (req.session && req.session.userInfo) ? getUserSession(req.session) : await idpClient.login(req.body['code'], req.body['type'], req.body['redirectUri']);
-    // TODO temporary acl values
-    // @Austin TODO USER SESSION
-    req.session.userInfo = {idp: req.body['type'], email: email, acl: ["Open"]}
     req.session.tokens = tokens;
-
-    // TODO Add ACL SESSION
+    // Set User Session Including ACL property
     await getUserSessionData(req.session, email);
     res.json({ name });
   } catch (e) {
@@ -35,17 +31,7 @@ router.post('/login', async function(req, res, next) {
 /* Logout */
 router.post('/logout', async function(req, res, next) {
   try {
-    if (req.session) {
-      req.session.destroy( (err) => {
-        if (err) {
-          console.log(err);
-          return res.status(500).send({errors: err});
-        }
-        res.status(200).send({status: 'success'});
-      });
-    } else {
-      return res.status(200).send({status: 'success'});
-    }
+    return logout(req,res);
   } catch (e) {
     console.log(e);
     res.status(500).json({errors: e});

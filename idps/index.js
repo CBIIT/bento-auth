@@ -16,12 +16,13 @@ const oauth2Client = {
         // Validate File ACL in User ACL
         if (!authFileWithACL(userSession.acl, fileAcl)) return false;
         // Check Valid Token
-        if (userSession.type === 'google') {
-            return googleClient.authenticated(tokens);
-        } else if (userSession.type === 'NIH') {
-            return nihClient.authenticated(tokens);
+        if (userSession.idp === 'google') {
+            return await googleClient.authenticated(tokens);
+        } else if (userSession.idp === 'NIH') {
+            return await nihClient.authenticated(tokens);
         }
         // TODO Login.gov
+        return false;
     },
     logout: async(type, tokens) => {
         if (type === 'NIH') {

@@ -29,8 +29,16 @@ async function getUserSessionData(session, email) {
         if (result.role){
             session.userInfo.role = result.role;
         }
+        // IDP stored in user table
+        if (result.IDP){
+            session.userInfo.idp = result.IDP;
+        }
+
+        if (result.acl){
+            session.userInfo.acl = result.acl;
+        }
     }
-    return
+    return;
 }
 
 function checkAdminPermissions(userInfo) {

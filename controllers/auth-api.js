@@ -22,15 +22,12 @@ exports.logout = (req, res) => {
     }
 }
 
-function getACLFileAuth(req) {
-    if (req.session.tokens && req.session.userInfo && req.headers.acl)
-        return authFileWithACL(req.session.userInfo, req.headers.acl);
-    return false;
-}
-
 exports.authenticated = (req, res) => {
     if (req.headers.acl) {
-        return res.status(200).send({status: getACLFileAuth(req)});
+        let status = false;
+        // Authenticate With File ACL
+        if (req.session.userInfo) status = authFileWithACL(req.session.userInfo, req.headers.acl);
+        return res.status(200).send({status});
     }
 
     if (req.session.tokens) {
