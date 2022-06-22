@@ -1,4 +1,5 @@
-const fs = require('fs');
+const dotenv = require('dotenv')
+dotenv.config();
 
 const config = {
   version: process.env.VERSION,
@@ -20,7 +21,32 @@ const config = {
   DATA_FILE: process.env.DATA_FILE,
   //Testing
   TEST_EMAIL: process.env.TEST_EMAIL,
+  // MySQL Session
+  mysql_host: process.env.MY_SQL_HOST,
+  mysql_port: process.env.MY_SQL_PORT,
+  mysql_user: process.env.MY_SQL_USER,
+  mysql_password: process.env.MY_SQL_PASSWORD,
+  mysql_database: process.env.MY_SQL_DATABASE,
+  // Email settings
+  email_service_email: process.env.EMAIL_SERVICE_EMAIL,
+  email_transport: getTransportConfig()
 };
+
+function getTransportConfig() {
+  return {
+    host: process.env.EMAIL_SMTP_HOST,
+    port: process.env.EMAIL_SMTP_PORT,
+    // Optional AWS Email Identity
+    ...(process.env.EMAIL_USER && {
+          secure: true, // true for 465, false for other ports
+          auth: {
+            user: process.env.EMAIL_USER, // generated ethereal user
+            pass: process.env.EMAIL_PASSWORD, // generated ethereal password
+          }
+        }
+    )
+  };
+}
 
 if (!config.version) {
   config.version = 'Version not set'
