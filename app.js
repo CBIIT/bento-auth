@@ -3,8 +3,6 @@ const graphql = require("./data-management/init-graphql");
 var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
-var session = require('express-session');
-var FileStore = require('session-file-store')(session);
 var logger = require('morgan');
 const fs = require('fs');
 const cors = require('cors');
@@ -33,14 +31,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 // Set Session Storage
 app.use(createSession({ session_timeout: config.session_timeout }))
-var fileStoreOptions = {ttl: config.session_timeout, reapInterval: 10};
-
-app.use(session({
-  secret: config.cookie_secret,
-  rolling: true,
-  store: new FileStore(fileStoreOptions),
-}));
-
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/api/auth', authRouter);
