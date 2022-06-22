@@ -16,10 +16,16 @@ router.post('/login', async function(req, res, next) {
     // Set User Session Including ACL property
     await getUserSessionData(req.session, email);
     res.json({ name });
+    if (config.authorization_enabled) {
+      await getUserSessionData(req.session, email)
+    }
+    res.json({ name, email });
   } catch (e) {
     console.log(e);
     if (e.code && parseInt(e.code)) {
       res.status(e.code);
+    } else if (e.statusCode && parseInt(e.statusCode)) {
+      res.status(e.statusCode);
     } else {
       res.status(500);
     }
@@ -48,7 +54,6 @@ router.post('/authenticated', async function(req, res, next) {
     if (req.session.tokens && req.session.userInfo && req.headers.acl) {
       status = await idpClient.authenticated(req.session.userInfo, req.session.tokens,req.headers.acl);
     }
-    return res.status(200).send({status: status});
   } catch (e) {
     console.log(e);
     res.status(500).json({errors: e});

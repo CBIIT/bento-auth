@@ -1,7 +1,7 @@
 const {v4} = require('uuid')
 const neo4j = require('./neo4j-service')
 const config = require('../config');
-const {errorName, valid_idps} = require("./graphql-api-constants");
+const {errorName, valid_idps, errorType} = require("./graphql-api-constants");
 const {sendAdminNotification, sendRegistrationConfirmation, sendApprovalNotification, sendRejectionNotification,
     sendEditNotification
 } = require("./notifications");
@@ -22,11 +22,17 @@ async function getUserSessionData(session, email) {
     }
     let result = await neo4j.getMyUser(session.userInfo);
     if (result) {
-        if (result.status) {
+        if (result.status && result.status === 'approved') {
             session.userInfo.status = result.status;
+        } else {
+            console.warn(`User "${email}" has not been approved!`)
+            throw errorType.NOT_APPROVED;
         }
         if (result.role) {
             session.userInfo.role = result.role;
+        } else {
+            console.warn(`User "${email}" does not have a role assigned!`)
+            throw errorType.NOT_AUTHORIZED;
         }
         if (result.firstName && result.lastName){
             session.userInfo.name = `${result.firstName} ${result.lastName}`;
@@ -38,8 +44,10 @@ async function getUserSessionData(session, email) {
         if (result.acl){
             session.userInfo.acl = result.acl;
         }
+    } else {
+        console.warn(`User "${email}" has not registered!`)
+        throw errorType.USER_NOT_FOUND;
     }
-    return
 }
 
 function checkAdminPermissions(userInfo) {
