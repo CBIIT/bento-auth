@@ -4,6 +4,7 @@ const idpClient = require('../idps');
 const {getUserSessionData} = require("../data-management/data-interface");
 const axios = require('axios');
 const {logout} = require('../controllers/auth-api')
+const {withAsync} = require("../middleware/middlewares");
 
 /* Login */
 router.post('/login', async function(req, res, next) {
@@ -31,7 +32,9 @@ router.post('/login', async function(req, res, next) {
 /* Logout */
 router.post('/logout', async function(req, res, next) {
   try {
-    return logout(req,res);
+    await idpClient.logout(req.body['type'], req.session.tokens);
+    // Remove User Session
+    return logout(req, res);
   } catch (e) {
     console.log(e);
     res.status(500).json({errors: e});
@@ -55,7 +58,7 @@ router.post('/authenticated', async function(req, res, next) {
 });
 
 /* TODO Temporary redirect file download request to avoid CORS issue */
-router.get('/files/:fileId', async function(req, res, next) {
+router.get('/files/:fileId', withAsync(async function(req, res, next) {
   const fileId = req.params.fileId;
   const result = await axios.get('http://localhost:3000/api/files/' + fileId, {
     headers: {
@@ -63,6 +66,6 @@ router.get('/files/:fileId', async function(req, res, next) {
     }
   });
   res.json(result.data);
-});
+}));
 
 module.exports = router;

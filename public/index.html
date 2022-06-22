@@ -94,8 +94,14 @@
         }
 
         async function nihSignOut() {
-            const rawResponse = await fetch('/api/auth/logout?type=NIH', {
-                method: 'GET'
+            const rawResponse = await fetch('/api/auth/logout', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                },
+                // TODO register custom redirectUri into login provider
+                body: JSON.stringify({type: 'NIH'})
             });
             const content = await rawResponse.json();
 
