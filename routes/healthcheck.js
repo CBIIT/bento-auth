@@ -1,15 +1,7 @@
 const express = require('express');
-const config = require("../config");
 const router = express.Router();
+const { ping, version } = require('../controllers/healthcheck')
 // health-check route
-router.get('/ping', (req, res, next) => {
-    res.send(`pong`);
-});
-
-router.get('/version', (req, res, next) => {
-    res.json({
-        version: config.version,
-        date: config.date
-    });
-});
+router.get('/ping', ping);
+router.get('/version', version);
 module.exports = router;
