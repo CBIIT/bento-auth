@@ -1,4 +1,4 @@
-const {getNIHToken, nihUserInfo, nihLogout} = require("../services/auth");
+const {getNIHToken, nihUserInfo, nihLogout} = require("../services/nih-auth");
 
 const client = {
     login: async (code, redirectingURL) => {

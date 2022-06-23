@@ -1,31 +1,29 @@
 const googleClient = require('./google');
 const nihClient = require('./nih');
+const {isCaseInsensitiveEqual} = require("../util/string-util");
 
 const oauth2Client = {
-    login: async (code, type, redirectingURL) => {
+    login: async (code, idp, redirectingURL) => {
         // if google
-        if (type === 'google') {
+        if (isCaseInsensitiveEqual(idp, 'google')) {
             return googleClient.login(code);
-        } else if (type === 'NIH') {
+        } else if (isCaseInsensitiveEqual(idp,'NIH')) {
             return nihClient.login(code, redirectingURL);
         }
-        // TODO Login.gov
     },
     authenticated: async (userSession, tokens, fileAcl) => {
         // Check Valid Token
-        if (userSession.idp === 'google') {
+        if (isCaseInsensitiveEqual(userSession.idp,'google')) {
             return await googleClient.authenticated(tokens);
-        } else if (userSession.idp === 'NIH') {
+        } else if (isCaseInsensitiveEqual(userSession.idp,'NIH')) {
             return await nihClient.authenticated(tokens);
         }
-        // TODO Login.gov
         return false;
     },
-    logout: async(type, tokens) => {
-        if (type === 'NIH') {
+    logout: async(idp, tokens) => {
+        if (isCaseInsensitiveEqual(idp,'NIH')) {
             return nihClient.logout(tokens);
         }
-        // TODO Login.gov
     }
 }
 

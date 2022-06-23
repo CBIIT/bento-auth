@@ -1,11 +1,3 @@
-const {nihLogout} = require("../services/auth");
-exports.nihLogout = async (req, res) => {
-    const response = await nihLogout(req);
-    const jsonRes = await response.json();
-    if (jsonRes.session_status) return this.logout(req,res);
-    else throw 500;
-}
-
 exports.logout = (req, res) => {
     if (req.session) {
         req.session.destroy( (err) => {
