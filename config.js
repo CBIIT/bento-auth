@@ -23,13 +23,12 @@ const config = {
   //Testing
   TEST_EMAIL: process.env.TEST_EMAIL,
   // MySQL Session
-  mysql_host: process.env.MY_SQL_HOST,
-  mysql_port: process.env.MY_SQL_PORT,
-  mysql_user: process.env.MY_SQL_USER,
-  mysql_password: process.env.MY_SQL_PASSWORD,
-  mysql_database: process.env.MY_SQL_DATABASE,
+  mysql_host: process.env.MYSQL_HOST,
+  mysql_port: process.env.MYSQL_PORT,
+  mysql_user: process.env.MYSQL_USER,
+  mysql_password: process.env.MYSQL_PASSWORD,
+  mysql_database: process.env.MYSQL_DATABASE,
   // Email settings
-  email_service_email: process.env.EMAIL_SERVICE_EMAIL,
   email_transport: getTransportConfig(),
   isAWSEmailEnabled: isAWSEmailEnabled()
 };

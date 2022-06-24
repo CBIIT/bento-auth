@@ -22,7 +22,7 @@ module.exports = {
                 getEmailSender(),
                 email_constants.ADMIN_NOTIFICATION_SUBJECT,
                 await createEmailTemplate("notification-template.html", {
-                    message: email_constants.ADMIN_NOTIFICATION_CONTENT, title: email_constants.ADMIN_NOTIFICATION_SUBJECT, ...template_params
+                    message: email_constants.ADMIN_NOTIFICATION_CONTENT, ...template_params
                 }),
                 admins
             );
@@ -36,7 +36,9 @@ module.exports = {
             await sendNotification(
                 getEmailSender(),
                 email_constants.CONFIRMATION_SUBJECT,
-                await createEmailTemplate("notification-template.html", template_params),
+                await createEmailTemplate("notification-template.html", {
+                    message: email_constants.CONFIRMATION_CONTENT, ...template_params
+                }),
                 email
             );
         } else {
@@ -49,7 +51,7 @@ module.exports = {
                 getEmailSender(),
                 email_constants.APPROVAL_SUBJECT,
                 await createEmailTemplate("notification-template.html", {
-                    message: email_constants.APPROVAL_CONTENT, title: email_constants.APPROVAL_SUBJECT, ...template_params
+                    message: email_constants.APPROVAL_CONTENT, ...template_params
                 }),
                 email
             );
@@ -63,8 +65,7 @@ module.exports = {
                 getEmailSender(),
                 email_constants.REJECTION_SUBJECT,
                 await createEmailTemplate("notification-template.html", {
-                    // @Austin TODO Adding following rejection reason
-                    message: email_constants.REJECTION_CONTENT_PRE_COMMENT + email_constants.REJECTION_CONTENT_POST_COMMENT, title: email_constants.REJECTION_SUBJECT, ...template_params
+                    message: email_constants.REJECTION_CONTENT_PRE_COMMENT + template_params.comment + email_constants.REJECTION_CONTENT_POST_COMMENT, ...template_params
                 }),
                 email
             );
@@ -78,8 +79,7 @@ module.exports = {
                 getEmailSender(),
                 email_constants.EDIT_SUBJECT,
                 await createEmailTemplate("notification-template.html", {
-                    // @Austin TODO Adding following rejection reason
-                    message: email_constants.EDIT_CONTENT_PRE_COMMENT + email_constants.EDIT_CONTENT_POST_COMMENT, title: email_constants.EDIT_SUBJECT, ...template_params
+                    message: email_constants.EDIT_CONTENT_PRE_COMMENT + template_params.comment + email_constants.EDIT_CONTENT_POST_COMMENT, ...template_params
                 }),
                 email
             );
