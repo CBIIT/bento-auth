@@ -4,27 +4,16 @@ var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
 const {createSession} = require("./services/session");
-var logger = require('morgan');
-const fs = require('fs');
+const {createLogStream} = require("./middleware/middleware");
 const cors = require('cors');
 const config = require('./config');
 console.log(config);
 
-const LOG_FOLDER = 'logs';
-if (!fs.existsSync(LOG_FOLDER)) {
-  fs.mkdirSync(LOG_FOLDER);
-}
-
-
-// create a write stream (in append mode)
-const accessLogStream = fs.createWriteStream(path.join(__dirname, LOG_FOLDER, 'access.log'), { flags: 'a'})
-
 var authRouter = require('./routes/auth');
 var app = express();
 app.use(cors());
-
 // setup the logger
-app.use(logger('combined', { stream: accessLogStream }))
+app.use(createLogStream(__dirname));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(createSession({ session_timeout: config.session_timeout }));
