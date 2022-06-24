@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Bento TEST TEST</title>
+    <title><%- title %></title>
     <style>
       body,
       pre {
@@ -15,11 +15,9 @@
   <body>
     <p>Dear <%- firstName %> <%- lastName %>,</p>
 
-    <p>TEST</p>
-
-    <p>Please contact the site administrators if you have further questions, or believe this update was made in error.</p>
+    <p><%- message %></p>
 
     <p>Sincerely,</p>
-    <p>BENTO Admin Team</p>
+    <p>Bento Admin Team</p>
   </body>
 </html>
