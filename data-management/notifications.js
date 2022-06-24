@@ -1,13 +1,12 @@
 const yaml = require('js-yaml');
-const fs   = require('fs');
+const fs = require('fs');
 const {sendNotification} = require("../services/notify");
 const {createEmailTemplate} = require("../lib/create-email-template");
 
 let email_constants = undefined
-try{
+try {
     email_constants = yaml.load(fs.readFileSync('yaml/notification_email_values.yaml', 'utf8'));
-}
-catch (e) {
+} catch (e) {
     console.error(e)
 }
 
