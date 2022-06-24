@@ -1,7 +1,7 @@
 const { createTransport } = require('nodemailer');
 const config = require('../config');
 
-async function sendNotification({ from, to = [], cc = [], bcc = [], subject, html }) {
+async function sendNotification(from, subject, html, to = [], cc = [], bcc = []) {
 
     if (!to?.length) {
         throw new Error('Missing recipient');
@@ -20,7 +20,22 @@ async function sendNotification({ from, to = [], cc = [], bcc = [], subject, htm
 
 async function sendMail(params) {
     const transport = createTransport(config.email_transport);
-    return await transport.sendMail(params);
+    console.log("Generating email to: "+params.to.join(', '));
+    if (config.emails_enabled){
+        try{
+            let result = await transport.sendMail(params);
+            console.log("Email sent");
+            return result;
+        }
+        catch (err){
+            console.error("Email failed to send with ths following reason:" + err.message);
+            return err;
+        }
+    }
+    else {
+        console.log("Email not sent, email is disabled by configuration");
+        return true;
+    }
 }
 
 function asArray(values = []) {
