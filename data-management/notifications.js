@@ -1,83 +1,84 @@
-const {sendEmail} = require("./email");
 const yaml = require('js-yaml');
-const fs   = require('fs');
+const fs = require('fs');
+const {sendNotification} = require("../services/notify");
+const {createEmailTemplate} = require("../lib/create-email-template");
 
 let email_constants = undefined
-try{
+try {
     email_constants = yaml.load(fs.readFileSync('yaml/notification_email_values.yaml', 'utf8'));
-}
-catch (e) {
+} catch (e) {
     console.error(e)
 }
 
-
 module.exports = {
-    sendAdminNotification: async (admins) => {
-        if (email_constants){
-            if (Array.isArray(admins)){
-                admins.forEach((adminEmail) => {
-                    sendEmail(
-                        adminEmail,
-                        email_constants.ADMIN_NOTIFICATION_SUBJECT,
-                        email_constants.ADMIN_NOTIFICATION_CONTENT
-                    );
-                })
-            }
-            else {
-                console.error('send email failed, admins parameter of sendAdminNotification is not an array');
-            }
-        }
-        else{
+    sendAdminNotification: async (admins, template_params) => {
+        if (email_constants) {
+            await sendNotification(
+                email_constants.NOTIFICATION_SENDER,
+                email_constants.ADMIN_NOTIFICATION_SUBJECT,
+                await createEmailTemplate("notification-template.html", {
+                    message: email_constants.ADMIN_NOTIFICATION_CONTENT, ...template_params
+                }),
+                admins
+            );
+        } else {
             console.error("Unable to load email constants from file, email not sent")
         }
 
     },
-    sendRegistrationConfirmation: async (email) => {
+    sendRegistrationConfirmation: async (email, template_params) => {
         if (email_constants) {
-            sendEmail(
-                email,
+            await sendNotification(
+                email_constants.NOTIFICATION_SENDER,
                 email_constants.CONFIRMATION_SUBJECT,
-                email_constants.CONFIRMATION_CONTENT
+                await createEmailTemplate("notification-template.html", {
+                    message: email_constants.CONFIRMATION_CONTENT, ...template_params
+                }),
+                email
             );
-        }
-        else{
+        } else {
             console.error("Unable to load email constants from file, email not sent")
         }
-
     },
-    sendApprovalNotification: async (email) => {
+    sendApprovalNotification: async (email, template_params) => {
         if (email_constants) {
-            sendEmail(
-                email,
+            await sendNotification(
+                email_constants.NOTIFICATION_SENDER,
                 email_constants.APPROVAL_SUBJECT,
-                email_constants.APPROVAL_CONTENT
+                await createEmailTemplate("notification-template.html", {
+                    message: email_constants.APPROVAL_CONTENT, ...template_params
+                }),
+                email
             );
-        }
-        else{
+        } else {
             console.error("Unable to load email constants from file, email not sent")
         }
     },
-    sendRejectionNotification: async (email, comment) => {
+    sendRejectionNotification: async (email, template_params) => {
         if (email_constants) {
-            sendEmail(
-                email,
+            await sendNotification(
+                email_constants.NOTIFICATION_SENDER,
                 email_constants.REJECTION_SUBJECT,
-                email_constants.REJECTION_CONTENT_PRE_COMMENT + comment + email_constants.REJECTION_CONTENT_POST_COMMENT
+                await createEmailTemplate("notification-template.html", {
+                    message: email_constants.REJECTION_CONTENT_PRE_COMMENT + template_params.comment + email_constants.REJECTION_CONTENT_POST_COMMENT, ...template_params
+                }),
+                email
             );
-        }
-        else {
+        } else {
             console.error("Unable to load email constants from file, email not sent")
         }
     },
-    sendEditNotification: async (email, comment) => {
+    sendEditNotification: async (email, template_params) => {
         if (email_constants) {
-            sendEmail(
-                email,
+            await sendNotification(
+                email_constants.NOTIFICATION_SENDER,
                 email_constants.EDIT_SUBJECT,
-                email_constants.EDIT_CONTENT_PRE_COMMENT + comment + email_constants.EDIT_CONTENT_POST_COMMENT
+                await createEmailTemplate("notification-template.html", {
+                    message: email_constants.EDIT_CONTENT_PRE_COMMENT + template_params.comment + email_constants.EDIT_CONTENT_POST_COMMENT, ...template_params
+                }),
+                email
             );
-        }
-        else {
+        } else {
             console.error("Unable to load email constants from file, email not sent")
         }
     }

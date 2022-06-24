@@ -117,11 +117,20 @@ const registerUser = async (input, context) => {
             ...input.userInfo,
             ...generatedInfo
         };
-        let result = await neo4j.registerUser(registrationInfo);
-        let adminEmails = await getAdminEmails();
-        await sendAdminNotification(adminEmails);
-        await sendRegistrationConfirmation(input.userInfo.email)
-        return result;
+        let response = await neo4j.registerUser(registrationInfo);
+        if (response) {
+            let adminEmails = await getAdminEmails();
+            let template_params = {
+                firstName: response.firstName,
+                lastName: response.lastName
+            }
+            await sendAdminNotification(adminEmails, template_params);
+            await sendRegistrationConfirmation(response.email, template_params)
+            return response;
+        }
+        else {
+            return new Error(errorName.UNABLE_TO_REGISTER_USER);
+        }
     } catch (err) {
         return err;
     }
@@ -145,9 +154,11 @@ const approveUser = async (parameters, context) => {
             parameters.approvalDate = (new Date()).toString()
             let response = await neo4j.approveUser(parameters)
             if (response) {
-                if (response.email) {
-                    await sendApprovalNotification(response.email);
-                }
+                let template_params = {
+                    firstName: response.firstName,
+                    lastName: response.lastName
+                };
+                await sendApprovalNotification(response.email, template_params);
                 return response;
             } else {
                 return new Error(errorName.USER_NOT_FOUND);
@@ -172,9 +183,12 @@ const rejectUser = async (parameters, context) => {
             parameters.rejectionDate = (new Date()).toString()
             let response = await neo4j.rejectUser(parameters)
             if (response) {
-                if (response.email) {
-                    await sendRejectionNotification(response.email, response.comment);
+                let template_params = {
+                    firstName: response.firstName,
+                    lastName: response.lastName,
+                    comment: response.comment
                 }
+                await sendRejectionNotification(response.email, template_params);
                 return response;
             } else {
                 return new Error(errorName.USER_NOT_FOUND);
@@ -230,9 +244,12 @@ const editUser = async (parameters, context) => {
             }
             let response = await neo4j.editUser(parameters)
             if (response) {
-                if (response.email) {
-                    await sendEditNotification(response.email, response.comment);
+                let template_params = {
+                    firstName: response.firstName,
+                    lastName: response.lastName,
+                    comment: response.comment
                 }
+                await sendEditNotification(response.email, template_params);
                 return response;
             } else {
                 return new Error(errorName.USER_NOT_FOUND);
