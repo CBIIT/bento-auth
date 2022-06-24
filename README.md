@@ -25,7 +25,6 @@ Following environmental variables are needed
 - MYSQL_PASSWORD : The password for the service user of the MYSQL database
 - MYSQL_DATABASE : The MYSQL database name
 # Email notification configuration
-- EMAIL_SERVICE_EMAIL: bento administrator's email address
 - EMAIL_SMTP_HOST: email server hostname
 - EMAIL_SMTP_PORT: email server port number
 # Additional configuration for email server

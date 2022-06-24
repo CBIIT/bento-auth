@@ -12,7 +12,7 @@ try {
 }
 // Improvement needed; NIH only allow NIH email address
 function getEmailSender() {
-    return config.isAWSEmailEnabled ? config.email_service_email : email_constants.NOTIFICATION_SENDER;
+    return config.isAWSEmailEnabled ? email_constants.ADMIN_SENDER : email_constants.NOTIFICATION_SENDER;
 }
 
 module.exports = {
