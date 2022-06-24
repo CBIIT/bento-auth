@@ -1,4 +1,4 @@
-NOTIFICATION_SENDER: "bento-notifications@email.com"
+NOTIFICATION_SENDER: "do-not-reply@bento-tools.org"
 ADMIN_NOTIFICATION_SUBJECT: "Bento user registration received"
 ADMIN_NOTIFICATION_CONTENT: "There is a new user registration pending review"
 CONFIRMATION_SUBJECT: "Bento registration confirmation"
