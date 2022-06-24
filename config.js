@@ -30,15 +30,20 @@ const config = {
   mysql_database: process.env.MY_SQL_DATABASE,
   // Email settings
   email_service_email: process.env.EMAIL_SERVICE_EMAIL,
-  email_transport: getTransportConfig()
+  email_transport: getTransportConfig(),
+  isAWSEmailEnabled: isAWSEmailEnabled()
 };
+
+function isAWSEmailEnabled() {
+  return process.env.EMAIL_USER !== undefined && process.env.EMAIL_PASSWORD !== undefined
+}
 
 function getTransportConfig() {
   return {
     host: process.env.EMAIL_SMTP_HOST,
     port: process.env.EMAIL_SMTP_PORT,
     // Optional AWS Email Identity
-    ...(process.env.EMAIL_USER && {
+    ...(isAWSEmailEnabled() && {
           secure: true, // true for 465, false for other ports
           auth: {
             user: process.env.EMAIL_USER, // generated ethereal user
