@@ -28,7 +28,7 @@ async function sendMail(params) {
             return result;
         }
         catch (err){
-            console.log("Email failed to send");
+            console.error("Email failed to send with ths following reason:" + err.message);
             return err;
         }
     }
