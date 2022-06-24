@@ -20,6 +20,7 @@ if (!fs.existsSync(LOG_FOLDER)) {
 const accessLogStream = fs.createWriteStream(path.join(__dirname, LOG_FOLDER, 'access.log'), { flags: 'a'})
 
 var authRouter = require('./routes/auth');
+const healthRouter = require('./routes/healthcheck');
 var app = express();
 app.use(cors());
 
@@ -32,6 +33,7 @@ app.use(createSession({ session_timeout: config.session_timeout }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/api/auth', authRouter);
+app.use('/api/auth', healthRouter);
 app.use('/api/auth/graphql', graphql);
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
