@@ -11,6 +11,7 @@ const config = {
   cookie_secret: process.env.COOKIE_SECRET,
   session_timeout: process.env.SESSION_TIMEOUT ? parseInt(process.env.SESSION_TIMEOUT) : 30 * 60,  // 30 minutes
   authorization_enabled: process.env.AUTHORIZATION_ENABLED ? process.env.AUTHORIZATION_ENABLED.toLowerCase() === 'true' : true,
+  emails_enabled: process.env.EMAILS_ENABLED ? process.env.EMAILS_ENABLED.toLowerCase() === 'true' : true,
 
   //Neo4j connection
   NEO4J_URI: process.env.NEO4J_URI,
@@ -22,13 +23,12 @@ const config = {
   //Testing
   TEST_EMAIL: process.env.TEST_EMAIL,
   // MySQL Session
-  mysql_host: process.env.MY_SQL_HOST,
-  mysql_port: process.env.MY_SQL_PORT,
-  mysql_user: process.env.MY_SQL_USER,
-  mysql_password: process.env.MY_SQL_PASSWORD,
-  mysql_database: process.env.MY_SQL_DATABASE,
+  mysql_host: process.env.MYSQL_HOST,
+  mysql_port: process.env.MYSQL_PORT,
+  mysql_user: process.env.MYSQL_USER,
+  mysql_password: process.env.MYSQL_PASSWORD,
+  mysql_database: process.env.MYSQL_DATABASE,
   // Email settings
-  email_service_email: process.env.EMAIL_SERVICE_EMAIL,
   email_transport: getTransportConfig()
 };
 
