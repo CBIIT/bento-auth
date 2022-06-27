@@ -3,18 +3,21 @@ const router = express.Router();
 const idpClient = require('../idps');
 const config = require('../config');
 const {getUserSessionData} = require("../data-management/data-interface");
-
+const {logout} = require('../controllers/auth-api')
 
 /* Login */
 router.post('/login', async function(req, res, next) {
   try {
-    const code = req.body['code'];
-    const { name, tokens, email } = await idpClient.login(code);
+    const { name, tokens, email } = await idpClient.login(req.body['code'], req.body['IDP'], req.body['redirectUri']);
     req.session.tokens = tokens;
     if (config.authorization_enabled) {
       await getUserSessionData(req.session, email)
+      let role =  req.session.userInfo.role;
+      res.json({name, email, role});
     }
-    res.json({ name, email });
+    else{
+      res.json({ name, email});
+    }
   } catch (e) {
     console.log(e);
     if (e.code && parseInt(e.code)) {
@@ -32,17 +35,9 @@ router.post('/login', async function(req, res, next) {
 /* Logout */
 router.post('/logout', async function(req, res, next) {
   try {
-    if (req.session) {
-      req.session.destroy( (err) => {
-        if (err) {
-          console.log(err);
-          return res.status(500).send({errors: err});
-        }
-        res.status(200).send({status: 'success'});
-      });
-    } else {
-      return res.status(200).send({status: 'success'});
-    }
+    await idpClient.logout(req.body['IDP'], req.session.tokens);
+    // Remove User Session
+    return logout(req, res);
   } catch (e) {
     console.log(e);
     res.status(500).json({errors: e});

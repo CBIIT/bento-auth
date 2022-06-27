@@ -50,7 +50,7 @@ async function getMyUser(parameters) {
     const cypher =
         `
         MATCH (user:User)
-        WHERE user.email = $email
+        WHERE user.email = $email AND user.IDP = $idp
         return user
     `
     const result = await executeQuery(parameters, cypher, 'user');
