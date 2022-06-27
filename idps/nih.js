@@ -4,7 +4,7 @@ const client = {
     login: async (code, redirectingURL) => {
         const token = await getNIHToken(code, redirectingURL);
         const user = await nihUserInfo(token);
-        return {name: user.name, email: user.email, tokens: token};
+        return {name: user.first_name, email: user.email, tokens: token};
     },
     authenticated: async (tokens) => {
         try {
