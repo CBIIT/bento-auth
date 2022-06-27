@@ -93,13 +93,14 @@ const listUsers = (input, context) => {
     }
 }
 
-const registerUser = async (input, context) => {
-    if (input.userInfo && input.userInfo.email && input.userInfo.IDP) {
-        let idp = input.userInfo.IDP;
+const registerUser = async (parameters, context) => {
+    formatParams(parameters.userInfo);
+    if (parameters.userInfo && parameters.userInfo.email && parameters.userInfo.IDP) {
+        let idp = parameters.userInfo.IDP;
         if (!valid_idps.includes(idp.toLowerCase())){
             return new Error(errorName.INVALID_IDP);
         }
-        let unique = await checkUnique(input.userInfo.email, idp)
+        let unique = await checkUnique(parameters.userInfo.email, idp)
         if (!unique) {
             return new Error(errorName.NOT_UNIQUE);
         }
@@ -114,7 +115,7 @@ const registerUser = async (input, context) => {
             role: "standard"
         };
         let registrationInfo = {
-            ...input.userInfo,
+            ...parameters.userInfo,
             ...generatedInfo
         };
         let response = await neo4j.registerUser(registrationInfo);
@@ -138,9 +139,9 @@ const registerUser = async (input, context) => {
 
 
 const approveUser = async (parameters, context) => {
+    formatParams(parameters);
     try {
         let userInfo = context.session.userInfo;
-        parameters.role = parameters.role.toLowerCase();
         if (!userInfo) {
             return new Error(errorName.NOT_LOGGED_IN);
         } else if (!checkAdminPermissions(userInfo)) {
@@ -171,6 +172,7 @@ const approveUser = async (parameters, context) => {
 
 
 const rejectUser = async (parameters, context) => {
+    formatParams(parameters);
     try {
         let userInfo = context.session.userInfo;
         if (!userInfo) {
@@ -201,6 +203,7 @@ const rejectUser = async (parameters, context) => {
 
 
 const editUser = async (parameters, context) => {
+    formatParams(parameters);
     try {
         let userInfo = context.session.userInfo;
         if (!userInfo) {
@@ -210,13 +213,11 @@ const editUser = async (parameters, context) => {
         }
         else {
             if (parameters.role) {
-                parameters.role = parameters.role.toLowerCase();
                 if (!(parameters.role === 'admin' || parameters.role === 'standard')){
                     return new Error(errorName.INVALID_ROLE);
                 }
             }
             if (parameters.status) {
-                parameters.status = parameters.status.toLowerCase();
                 if (!(parameters.status === 'approved' || parameters.status === 'rejected' || parameters.status === 'registered')){
                     return new Error(errorName.INVALID_STATUS);
                 }
@@ -257,6 +258,18 @@ const editUser = async (parameters, context) => {
         }
     } catch (err) {
         return err;
+    }
+}
+
+function formatParams(params){
+    if (params.email){
+        params.email = params.email.toLowerCase();
+    }
+    if (params.role){
+        params.role = params.role.toLowerCase();
+    }
+    if (params.status){
+        params.status = params.status.toLowerCase();
     }
 }
 
