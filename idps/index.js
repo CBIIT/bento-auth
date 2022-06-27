@@ -1,18 +1,30 @@
-const config = require('../config');
 const googleClient = require('./google');
-const testIDP = require('./testIDP');
+const nihClient = require('./nih');
+const {isCaseInsensitiveEqual} = require("../util/string-util");
 
-let oauth2Client;
-switch (config.idp) {
-    case 'test-idp':
-        oauth2Client = testIDP;
-        break;
-    case 'fence':
-        oauth2Client = null;
-        break;
-    case 'google':
-    default:
-        oauth2Client = googleClient;
+const oauth2Client = {
+    login: async (code, idp, redirectingURL) => {
+        // if google
+        if (isCaseInsensitiveEqual(idp, 'google')) {
+            return googleClient.login(code);
+        } else if (isCaseInsensitiveEqual(idp,'NIH')) {
+            return nihClient.login(code, redirectingURL);
+        }
+    },
+    authenticated: async (userSession, tokens, fileAcl) => {
+        // Check Valid Token
+        if (isCaseInsensitiveEqual(userSession.idp,'google')) {
+            return await googleClient.authenticated(tokens);
+        } else if (isCaseInsensitiveEqual(userSession.idp,'NIH')) {
+            return await nihClient.authenticated(tokens);
+        }
+        return false;
+    },
+    logout: async(idp, tokens) => {
+        if (isCaseInsensitiveEqual(idp,'NIH')) {
+            return nihClient.logout(tokens);
+        }
+    }
 }
 
 module.exports = oauth2Client;
