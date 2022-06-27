@@ -13,8 +13,12 @@ router.post('/login', async function(req, res, next) {
     req.session.tokens = tokens;
     if (config.authorization_enabled) {
       await getUserSessionData(req.session, email)
+      let role =  req.session.userInfo.role;
+      res.json({name, email, role});
     }
-    res.json({ name, email });
+    else{
+      res.json({ name, email});
+    }
   } catch (e) {
     console.log(e);
     if (e.code && parseInt(e.code)) {
