@@ -12,6 +12,7 @@ exports.errorName = {
     ALREADY_REJECTED: "ALREADY_REJECTED",
     INVALID_ROLE: "INVALID_ROLE",
     INVALID_STATUS: "INVALID_STATUS",
+    UNABLE_TO_REGISTER_USER: 'UNABLE_TO_REGISTER_USER'
 };
 
 exports.errorType = {
@@ -57,6 +58,10 @@ exports.errorType = {
     },
     ALREADY_REJECTED: {
         message: "The specified user has already been rejected",
+        statusCode: 409
+    },
+    UNABLE_TO_REGISTER_USER: {
+        message: "Something went wrong while registering the user",
         statusCode: 409
     }
 };
