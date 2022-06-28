@@ -8,10 +8,10 @@ const {logout} = require('../controllers/auth-api')
 /* Login */
 router.post('/login', async function(req, res, next) {
   try {
-    const { name, tokens, email } = await idpClient.login(req.body['code'], req.body['IDP'], req.body['redirectUri']);
+    const { name, tokens, email, idp } = await idpClient.login(req.body['code'], req.body['IDP'], req.body['redirectUri']);
     req.session.tokens = tokens;
     if (config.authorization_enabled) {
-      await getUserSessionData(req.session, email)
+      await getUserSessionData(req.session, email, idp);
       let role =  req.session.userInfo.role;
       res.json({name, email, role});
     }
@@ -60,6 +60,21 @@ router.post('/authenticated', async function(req, res, next) {
   }
 });
 
+/* Authorized File ACL Value */
+// Return {status: true} or {status: false}
+// Calling this API will authenticate with file acl
+router.post('/authorized', async function(req, res) {
+  try {
+    let status = false;
+    if (req.session.tokens && req.session.userInfo && req.headers.acl) {
+      status = idpClient.authorized(req.session.userInfo.acl, req.headers.acl);
+    }
+    return res.status(200).send({status: status});
+  } catch (e) {
+    console.log(e);
+    res.status(500).json({errors: e});
+  }
+});
 
 
 /* GET ping-ping for health checking. */
