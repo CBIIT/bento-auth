@@ -60,7 +60,21 @@ router.post('/authenticated', async function(req, res, next) {
   }
 });
 
-
+/* Authorized File ACL Value */
+// Return {status: true} or {status: false}
+// Calling this API will authenticate with file acl
+router.post('/authorized', async function(req, res) {
+  try {
+    let status = false;
+    if (req.session.tokens && req.session.userInfo && req.headers.acl) {
+      status = idpClient.authorized(req.session.userInfo.acl, req.headers.acl);
+    }
+    return res.status(200).send({status: status});
+  } catch (e) {
+    console.log(e);
+    res.status(500).json({errors: e});
+  }
+});
 
 /* GET ping-ping for health checking. */
 router.get('/ping', function(req, res, next) {

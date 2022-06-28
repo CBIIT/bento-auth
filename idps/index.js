@@ -1,6 +1,7 @@
 const googleClient = require('./google');
 const nihClient = require('./nih');
 const {isCaseInsensitiveEqual} = require("../util/string-util");
+const {authFileACL} = require("../services/file-auth");
 
 const oauth2Client = {
     login: async (code, idp, redirectingURL) => {
@@ -11,7 +12,7 @@ const oauth2Client = {
             return nihClient.login(code, redirectingURL);
         }
     },
-    authenticated: async (userSession, tokens, fileAcl) => {
+    authenticated: async (userSession, tokens) => {
         // Check Valid Token
         if (isCaseInsensitiveEqual(userSession.idp,'google')) {
             return await googleClient.authenticated(tokens);
@@ -24,6 +25,10 @@ const oauth2Client = {
         if (isCaseInsensitiveEqual(idp,'NIH')) {
             return nihClient.logout(tokens);
         }
+    },
+    authorized: (userAcl, fileAcl)=> {
+        // Check File ACL Validation in User Session
+        return authFileACL(userAcl, fileAcl);
     }
 }
 
