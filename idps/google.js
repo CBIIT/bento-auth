@@ -20,25 +20,6 @@ const oauth2Client = new google.auth.OAuth2(
         const email = payload.email;
         const idp = "GOOGLE";
         return { name, tokens, email, idp };
-    },
-    authenticated: async (tokens) => {
-        try {
-            if (tokens) {
-                const ticket = await oauth2Client.verifyIdToken({
-                    idToken: tokens.id_token,
-                    audience: config.client_id
-                });
-                const payload = ticket.getPayload();
-                return true;
-            } else {
-                console.log('No tokens found!');
-                return false;
-            }
-
-        } catch (e) {
-           console.log(e);
-           return false;
-        }
     }
 }
 

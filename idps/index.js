@@ -12,22 +12,13 @@ const oauth2Client = {
             return nihClient.login(code, redirectingURL);
         }
     },
-    authenticated: async (userSession, tokens) => {
-        // Check Valid Token
-        if (isCaseInsensitiveEqual(userSession.idp,'google')) {
-            return await googleClient.authenticated(tokens);
-        } else if (isCaseInsensitiveEqual(userSession.idp,'NIH')) {
-            return await nihClient.authenticated(tokens);
-        }
-        return false;
-    },
     logout: async(idp, tokens) => {
         if (isCaseInsensitiveEqual(idp,'NIH')) {
             return nihClient.logout(tokens);
         }
     },
+    // authorize a user after file acl authentication
     authorized: (userAcl, fileAcl)=> {
-        // Check File ACL Validation in User Session
         return authFileACL(userAcl, fileAcl);
     }
 }

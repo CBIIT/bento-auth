@@ -6,21 +6,6 @@ const client = {
         const user = await nihUserInfo(token);
         return {name: user.first_name, email: user.email, tokens: token, idp: "NIH"};
     },
-    authenticated: async (tokens) => {
-        try {
-            if (!tokens) {
-                console.log('No tokens found!');
-                return false
-            }
-            // If not passing, throw error
-            await nihUserInfo(tokens);
-            return true;
-
-        } catch (e) {
-            console.log(e);
-        }
-        return false;
-    },
     logout: async(tokens) => {
         return await nihLogout(tokens);
     }

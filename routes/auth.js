@@ -89,21 +89,4 @@ router.get('/version', function(req, res, next) {
   });
 });
 
-/* TODO Temporary redirect file download request to avoid CORS issue */
-router.get('/files/:fileId', async function(req, res, next) {
-  try {
-
-    const fileId = req.params.fileId;
-    const result = await axios.get('http://localhost:3000/api/files/' + fileId, {
-      headers: {
-        Cookie: req.headers.cookie
-      }
-    });
-    res.json(result.data);
-  } catch (e) {
-    console.log(e);
-    res.status(500).json({errors: e});
-  }
-});
-
 module.exports = router;
