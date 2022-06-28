@@ -20,9 +20,10 @@ function setUserSessionOrThrow(session, result, name) {
 }
 
 // Sets userInfo in the session
-async function getUserSessionData(session, email) {
+async function getUserSessionData(session, email, idp) {
     session.userInfo = {
-        email: email
+        email: email,
+        idp: idp
     }
     let result = await neo4j.getMyUser(session.userInfo);
     if (result) {

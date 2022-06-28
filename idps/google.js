@@ -18,7 +18,8 @@ const oauth2Client = new google.auth.OAuth2(
         const payload = ticket.getPayload();
         const name = payload.given_name;
         const email = payload.email;
-        return { name, tokens, email };
+        const idp = "GOOGLE";
+        return { name, tokens, email, idp };
     },
     authenticated: async (tokens) => {
         try {

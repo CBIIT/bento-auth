@@ -8,10 +8,10 @@ const {logout} = require('../controllers/auth-api')
 /* Login */
 router.post('/login', async function(req, res, next) {
   try {
-    const { name, tokens, email } = await idpClient.login(req.body['code'], req.body['IDP'], req.body['redirectUri']);
+    const { name, tokens, email, idp } = await idpClient.login(req.body['code'], req.body['IDP'], req.body['redirectUri']);
     req.session.tokens = tokens;
     if (config.authorization_enabled) {
-      await getUserSessionData(req.session, email)
+      await getUserSessionData(req.session, email, idp);
       let role =  req.session.userInfo.role;
       res.json({name, email, role});
     }
@@ -87,6 +87,23 @@ router.get('/version', function(req, res, next) {
     version: config.version,
     date: config.date
   });
+});
+
+/* TODO Temporary redirect file download request to avoid CORS issue */
+router.get('/files/:fileId', async function(req, res, next) {
+  try {
+
+    const fileId = req.params.fileId;
+    const result = await axios.get('http://localhost:3000/api/files/' + fileId, {
+      headers: {
+        Cookie: req.headers.cookie
+      }
+    });
+    res.json(result.data);
+  } catch (e) {
+    console.log(e);
+    res.status(500).json({errors: e});
+  }
 });
 
 module.exports = router;
