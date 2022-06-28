@@ -1,5 +1,4 @@
 const newrelic = require('newrelic');
-const graphql = require("./data-management/init-graphql");
 var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
@@ -8,6 +7,7 @@ var logger = require('morgan');
 const fs = require('fs');
 const cors = require('cors');
 const config = require('./config');
+const {createProxyMiddleware, fixRequestBody} = require('http-proxy-middleware');
 console.log(config);
 
 const LOG_FOLDER = 'logs';
@@ -27,12 +27,24 @@ app.use(cors());
 app.use(logger('combined', { stream: accessLogStream }))
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(createSession({ session_timeout: config.session_timeout }));
+app.use(createSession({ sessionSecret: config.cookie_secret, session_timeout: config.session_timeout }));
 
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/api/auth', authRouter);
-app.use('/api/auth/graphql', graphql);
+
+if (config.authorization_enabled) {
+  app.use((req, res, next) => {
+    req.body = {...req.body, userInfo: req.session.userInfo}
+    next();
+  });
+  app.use('/api/auth/graphql', createProxyMiddleware({
+      target: config.authorization_url,
+      changeOrigin: true,
+      onProxyReq: fixRequestBody
+  }));
+}
+
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));

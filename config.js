@@ -11,6 +11,7 @@ const config = {
   cookie_secret: process.env.COOKIE_SECRET,
   session_timeout: process.env.SESSION_TIMEOUT ? parseInt(process.env.SESSION_TIMEOUT) : 30 * 60,  // 30 minutes
   authorization_enabled: process.env.AUTHORIZATION_ENABLED ? process.env.AUTHORIZATION_ENABLED.toLowerCase() === 'true' : true,
+  authorization_url: process.env.AUTHORIZATION_URL,
   emails_enabled: process.env.EMAILS_ENABLED ? process.env.EMAILS_ENABLED.toLowerCase() === 'true' : true,
 
   //Neo4j connection

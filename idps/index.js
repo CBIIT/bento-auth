@@ -1,5 +1,6 @@
 const googleClient = require('./google');
 const nihClient = require('./nih');
+const testIDP = require('./testIDP');
 const {isCaseInsensitiveEqual} = require("../util/string-util");
 
 const oauth2Client = {
@@ -9,6 +10,9 @@ const oauth2Client = {
             return googleClient.login(code);
         } else if (isCaseInsensitiveEqual(idp,'NIH')) {
             return nihClient.login(code, redirectingURL);
+        }
+        else if (isCaseInsensitiveEqual(idp,'test-idp')) {
+            return testIDP.login();
         }
     },
     authenticated: async (userSession, tokens, fileAcl) => {

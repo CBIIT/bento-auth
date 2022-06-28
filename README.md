@@ -8,6 +8,7 @@ Following environmental variables are needed
 - COOKIE_SECRET : secret used to sign cookies
 - SESSION_TIMEOUT : session timeout in seconds, default is 30 minutes
 - AUTHORIZATION_ENABLED : If not set to "true", then the authorization components will be disabled
+- AUTHORIZATION_URL: The URL of the authorization service
 - EMAILS_ENABLED : If not set to "true", then the email notifications will be disabled
 # Neo4j configuration
 - NEO4J_URI: Bolt URI of the Neo4j database
@@ -44,4 +45,4 @@ Following environmental variables are needed
 - NIH_TOKEN_URL: NIH API address to create token for login
 - NIH_LOGOUT_URL: NIH API address to invalidate token for logout
 - NIH_SCOPE: space-separated lists of identifiers to specify access privileges
-- NIH_PRO
+- NIH_PROMPT: 
