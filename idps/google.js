@@ -3,9 +3,9 @@ const config = require('../config');
 
 
 const oauth2Client = new google.auth.OAuth2(
-    config.client_id,
-    config.client_secret,
-    config.redirect_url
+    config.google.CLIENT_ID,
+    config.google.CLIENT_SECRET,
+    config.google.REDIRECT_URL
 );
 
  let client = {
