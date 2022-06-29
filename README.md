@@ -5,6 +5,7 @@ Following environmental variables are needed
 
 - VERSION : version number
 - DATE : build date
+- IDP : default identification provider, enabled if IDP is not provided from the client side e.g., "google" 
 - COOKIE_SECRET : secret used to sign cookies
 - SESSION_TIMEOUT : session timeout in seconds, default is 30 minutes
 - AUTHORIZATION_ENABLED : If not set to "true", then the authorization components will be disabled
