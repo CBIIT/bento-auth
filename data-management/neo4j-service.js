@@ -87,6 +87,7 @@ async function registerUser(parameters) {
             organization: $organization,
             userID: $userID,
             registrationDate: $registrationDate,
+            creationDate: $creationDate,
             status: $status,
             acl: $acl,
             role: $role

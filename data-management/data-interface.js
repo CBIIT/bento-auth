@@ -5,6 +5,7 @@ const {errorName, valid_idps, errorType} = require("./graphql-api-constants");
 const {sendAdminNotification, sendRegistrationConfirmation, sendApprovalNotification, sendRejectionNotification,
     sendEditNotification
 } = require("./notifications");
+const {INITIALIZED} = require("../constants/user-constant");
 
 async function checkUnique(email, IDP){
     return await neo4j.checkUnique(IDP+":"+email);
@@ -18,11 +19,11 @@ async function getAdminEmails(){
 async function getUserSessionData(session, email) {
     session.userInfo = {
         email: email,
-        idp: config.idp
+        idp: config.idp.toUpperCase()
     }
     let result = await neo4j.getMyUser(session.userInfo);
     if (result) {
-        if (result.status && result.status === 'approved') {
+        if (result.status && (result.status === 'approved' || result.status === INITIALIZED)) {
             session.userInfo.status = result.status;
         } else {
             console.warn(`User "${email}" has not been approved!`)

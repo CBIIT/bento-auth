@@ -1,7 +1,7 @@
 const { google } = require('googleapis');
 const config = require('../config');
-const neo4j = require("../data-management/neo4j-service");
 const UserInfo = require("../model/user-info");
+const {getUserInfo} = require("../services/user");
 
 const GOOGLE = 'GOOGLE';
 const oauth2Client = new google.auth.OAuth2(
@@ -18,10 +18,9 @@ const oauth2Client = new google.auth.OAuth2(
             audience: config.client_id
         });
         const payload = ticket.getPayload();
-        // inspect user registered already
-        const dbUser = await neo4j.getMyUser({email: payload.email, idp: GOOGLE});
-        const userInfo = (dbUser.firstName) ? new UserInfo(dbUser.firstName, dbUser.email, GOOGLE) : new UserInfo(payload.given_name, payload.email, GOOGLE);
-        return {tokens, ...userInfo.getUserInfo()};
+        // inspect user registered already. If not, store user in database
+        const userInfo = await getUserInfo(new UserInfo(payload.given_name, payload.family_name, payload.email, GOOGLE));
+        return {tokens, ...userInfo.getLoginUser()};
     }
 }
 
