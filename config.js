@@ -1,11 +1,22 @@
 const dotenv = require('dotenv')
 dotenv.config();
 
+function getRedirectUri(idp) {
+  switch (idp.toUpperCase()) {
+    case 'GOOGLE':
+      return process.env.GOOGLE_REDIRECT_URL;
+    case 'NIH':
+      return process.env.NIH_REDIRECT_URL;
+    default:
+      return 'http://localhost:4010';
+  }
+}
+
 const config = {
   version: process.env.VERSION,
   date: process.env.DATE,
   idp: process.env.IDP ? process.env.IDP.toLowerCase() : 'google',
-  redirectUri: process.env.GOOGLE_REDIRECT_URL ? process.env.GOOGLE_REDIRECT_URL : 'http://localhost:4010',
+  redirectUri: getRedirectUri(process.env.IDP),
   cookie_secret: process.env.COOKIE_SECRET,
   session_timeout: process.env.SESSION_TIMEOUT ? parseInt(process.env.SESSION_TIMEOUT) : 30 * 60,  // 30 minutes
   authorization_enabled: process.env.AUTHORIZATION_ENABLED ? process.env.AUTHORIZATION_ENABLED.toLowerCase() === 'true' : true,
