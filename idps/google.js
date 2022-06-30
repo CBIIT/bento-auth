@@ -13,7 +13,7 @@ const oauth2Client = new google.auth.OAuth2(
         const {tokens} = await oauth2Client.getToken(code)
         const ticket = await oauth2Client.verifyIdToken({
             idToken: tokens.id_token,
-            audience: config.client_id
+            audience: config.google.CLIENT_ID
         });
         const payload = ticket.getPayload();
         const name = payload.given_name;
