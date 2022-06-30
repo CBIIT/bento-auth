@@ -8,9 +8,8 @@ const client = {
         const token = await getNIHToken(code, redirectingURL);
         const user = await nihUserInfo(token);
         // inspect user registered already
-        const dbUser = await neo4j.getMyUser({email: user.email, idp: NIH});
-        const userInfo = (dbUser.firstName) ? new UserInfo(dbUser.firstName, dbUser.email, NIH) : new UserInfo(user.first_name, user.email, NIH);
-        return {tokens : token, ...userInfo.getUserInfo()};
+        const userInfo = new UserInfo(user.first_name, user.email, NIH);
+        return {tokens: token, ...userInfo.getUserInfo()};
     },
     logout: async(tokens) => {
         return await nihLogout(tokens);

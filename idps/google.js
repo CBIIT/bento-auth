@@ -17,9 +17,7 @@ const oauth2Client = new google.auth.OAuth2(
             audience: config.google.CLIENT_ID
         });
         const payload = ticket.getPayload();
-        // inspect user registered already
-        const dbUser = await neo4j.getMyUser({email: payload.email, idp: GOOGLE});
-        const userInfo = (dbUser && dbUser.firstName) ? new UserInfo(dbUser.firstName, dbUser.email, GOOGLE) : new UserInfo(payload.given_name, payload.email, GOOGLE);
+        const userInfo = new UserInfo(payload.given_name, payload.email, GOOGLE);
         return {tokens, ...userInfo.getUserInfo()};
     }
 }
