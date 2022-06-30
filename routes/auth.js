@@ -12,7 +12,7 @@ router.post('/login', async function (req, res) {
         req.session.tokens = tokens;
         if (config.authorization_enabled) {
             try {
-                let response = await fetch(config.authorization_url+'/api/auth/graphql', {
+                let response = await fetch(config.authorization_url+'/api/users/graphql', {
                     method: 'POST', headers: {
                         'Content-Type': 'application/json',
                         'email': email,

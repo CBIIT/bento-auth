@@ -40,7 +40,7 @@ if (config.authorization_enabled) {
       next();
   });
   app.use('/api/auth/graphql', createProxyMiddleware({
-      target: config.authorization_url,
+      target: config.authorization_url+'/api/users/graphql',
       changeOrigin: true,
       onProxyReq: fixRequestBody
   }));
