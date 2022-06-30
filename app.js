@@ -35,8 +35,9 @@ app.use('/api/auth', authRouter);
 
 if (config.authorization_enabled) {
   app.use((req, res, next) => {
-    req.body = {...req.body, userInfo: req.session.userInfo}
-    next();
+      req.headers['email'] = req.session.userInfo.email;
+      req.headers['idp'] = req.session.userInfo.idp;
+      next();
   });
   app.use('/api/auth/graphql', createProxyMiddleware({
       target: config.authorization_url,

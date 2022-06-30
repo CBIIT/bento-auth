@@ -14,8 +14,10 @@ router.post('/login', async function (req, res) {
             try {
                 let response = await fetch(config.authorization_url+'/api/auth/graphql', {
                     method: 'POST', headers: {
-                        'Content-Type': 'application/json'
-                    }, body: JSON.stringify({userInfo: {email, idp: req.body['IDP']}, query: '{getMyUser{role}}'})
+                        'Content-Type': 'application/json',
+                        'email': email,
+                        'idp': req.body['IDP']
+                    }, body: JSON.stringify({query: '{getMyUser{role}}'})
                 });
                 let result = await response.json();
                 if (result && result.data && result.data.getMyUser && result.data.getMyUser.role) {
