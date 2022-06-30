@@ -45,7 +45,6 @@ async function getUserSessionData(session, email, idp) {
     }
 
 }
-
 function checkAdminPermissions(userInfo) {
     return checkApproved(userInfo) && userInfo.role === 'admin';
 }
