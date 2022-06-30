@@ -9,18 +9,23 @@ async function getUserInfo(userInfo) {
     if (dbUser && dbUser.firstName) {
         return new UserInfo(dbUser.firstName, dbUser.lastName, dbUser.email, dbUser.IDP);
     }
+    // register user if not existed in db
+    await registerUser(userInfo);
+    return userInfo;
+}
 
+async function registerUser(userInfo) {
     const registrationInfo = {
         // generatedInfo,
         userID: v4(),
         creationDate: (new Date()).toString(),
         registrationDate: (new Date()).toString(),
-        status: "initialized",
+        // User Registration Info
         ...userInfo.getRegisterUser()
     };
-    let response = await neo4j.registerUser(registrationInfo);
+    const response = await neo4j.registerUser(registrationInfo);
     if (!response) return new Error(errorName.UNABLE_TO_REGISTER_USER);
-    return userInfo;
+    return response;
 }
 
 module.exports = {

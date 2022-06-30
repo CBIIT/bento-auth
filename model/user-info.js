@@ -1,4 +1,4 @@
-const {STANDARD} = require("../constants/user-constant");
+const {STANDARD, INITIALIZED} = require("../constants/user-constant");
 module.exports = class UserInfo {
     constructor(firstName, lastName, email, idp) {
         this.firstName = firstName;
@@ -12,7 +12,7 @@ module.exports = class UserInfo {
     }
 
     getRegisterUser() {
-        return {firstName: this.firstName, lastName: this.lastName, email: this.email, IDP: this.idp, role: STANDARD, organization: '', acl: []}
+        return {firstName: this.firstName, lastName: this.lastName, email: this.email, IDP: this.idp, role: STANDARD, status: INITIALIZED, organization: '', acl: []}
     }
 
     getEmail() { return this.email }
