@@ -3,7 +3,7 @@ const router = express.Router();
 const idpClient = require('../idps');
 const config = require('../config');
 const {getUserSessionData} = require("../data-management/data-interface");
-const {logout} = require('../controllers/auth-api')
+const {logout} = require('../controllers/auth-api');
 
 /* Login */
 router.post('/login', async function(req, res, next) {
@@ -14,7 +14,7 @@ router.post('/login', async function(req, res, next) {
     const { name, tokens, email } = await idpClient.login(req.body['code'], getIdpOrDefault(req.body['IDP']), getUrlOrDefault(req.body['redirectUri']));
     req.session.tokens = tokens;
     if (config.authorization_enabled) {
-      await getUserSessionData(req.session, email)
+      await getUserSessionData(req.session, email);
       let role =  req.session.userInfo.role;
       res.json({name, email, role});
     }
