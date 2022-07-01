@@ -1,25 +1,12 @@
 const dotenv = require('dotenv')
+const {isCaseInsensitiveEqual} = require("./util/string-util");
 dotenv.config();
 
 const GOOGLE = 'GOOGLE'
-const NIH = 'NIH';
-
-function getRedirectUri(idp) {
-  switch (idp.toUpperCase()) {
-    case GOOGLE:
-      return process.env.GOOGLE_REDIRECT_URL;
-    case NIH:
-      return process.env.NIH_REDIRECT_URL;
-    default:
-      return 'http://localhost:4010';
-  }
-}
-
 const config = {
   version: process.env.VERSION,
   date: process.env.DATE,
   idp: process.env.IDP ? process.env.IDP.toLowerCase() : GOOGLE.toLowerCase(),
-  redirectUri: getRedirectUri(process.env.IDP),
   cookie_secret: process.env.COOKIE_SECRET,
   session_timeout: process.env.SESSION_TIMEOUT ? parseInt(process.env.SESSION_TIMEOUT) : 30 * 60,  // 30 minutes
   authorization_enabled: process.env.AUTHORIZATION_ENABLED ? process.env.AUTHORIZATION_ENABLED.toLowerCase() === 'true' : true,
@@ -59,7 +46,16 @@ const config = {
   mysql_database: process.env.MYSQL_DATABASE,
   // Email settings
   email_service_email: process.env.EMAIL_SERVICE_EMAIL,
-  email_transport: getTransportConfig()
+  email_transport: getTransportConfig(),
+  getIdpOrDefault: (idp) => {
+    return (idp) ? idp : config.idp;
+  },
+  getUrlOrDefault: (idp, url) => {
+    // if (url) return url;
+    if (!url && isCaseInsensitiveEqual(idp,'GOOGLE')) return process.env.GOOGLE_REDIRECT_URL;
+    if (!url && isCaseInsensitiveEqual(idp,'NIH')) return process.env.NIH_REDIRECT_URL;
+    return url;
+  }
 };
 
 function getTransportConfig() {
