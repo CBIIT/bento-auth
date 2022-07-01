@@ -35,8 +35,10 @@ app.use('/api/auth', authRouter);
 
 if (config.authorization_enabled) {
   app.use((req, res, next) => {
-      req.headers['email'] = req.session.userInfo.email;
-      req.headers['idp'] = req.session.userInfo.idp;
+      if (req.session.userInfo){
+          req.headers['email'] = req.session.userInfo.email;
+          req.headers['idp'] = req.session.userInfo.idp;
+      }
       next();
   });
   app.use('/api/auth/graphql', createProxyMiddleware({
