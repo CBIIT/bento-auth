@@ -14,6 +14,12 @@ async function getAdminEmails(){
     return await neo4j.getAdminEmails();
 }
 
+function setUserSessionOrThrow(session, result, name) {
+    if (result[name]) return result[name];
+    console.warn(`User "${session.userInfo.email}" does not have a ${name} assigned!`);
+    throw errorType.NOT_AUTHORIZED;
+}
+
 // Sets userInfo in the session
 async function getUserSessionData(session, email, idp) {
     session.userInfo = {
@@ -28,12 +34,9 @@ async function getUserSessionData(session, email, idp) {
             console.warn(`User "${email}" has not been approved!`)
             throw errorType.NOT_APPROVED;
         }
-        if (result.role) {
-            session.userInfo.role = result.role;
-        } else {
-            console.warn(`User "${email}" does not have a role assigned!`)
-            throw errorType.NOT_AUTHORIZED;
-        }
+        session.userInfo.role = setUserSessionOrThrow(session, result, 'role');
+        session.userInfo.acl = setUserSessionOrThrow(session, result, 'acl');
+        session.userInfo.name = setUserSessionOrThrow(session, result, 'firstName');
     } else {
         console.warn(`User "${email}" has not registered!`)
         throw errorType.USER_NOT_FOUND;
