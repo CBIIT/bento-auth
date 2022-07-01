@@ -13,7 +13,7 @@ router.post('/login', async function(req, res, next) {
     const { name, tokens, email } = await idpClient.login(req.body['code'], idp, config.getUrlOrDefault(idp, req.body['redirectUri']));
     req.session.tokens = tokens;
     if (config.authorization_enabled) {
-      await getUserSessionData(req.session, email, idp);
+      await getUserSessionData(req.session, email);
       let role =  req.session.userInfo.role;
       res.json({name, email, role});
     }
