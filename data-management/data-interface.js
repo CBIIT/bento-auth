@@ -15,10 +15,10 @@ async function getAdminEmails(){
 }
 
 // Sets userInfo in the session
-async function getUserSessionData(session, email) {
+async function getUserSessionData(session, email, idp) {
     session.userInfo = {
         email: email,
-        idp: config.idp
+        idp: idp
     }
     let result = await neo4j.getMyUser(session.userInfo);
     if (result) {
