@@ -8,10 +8,9 @@ const {logout} = require('../controllers/auth-api')
 /* Login */
 router.post('/login', async function(req, res, next) {
 
-  const getIdpOrDefault = (idp) => { return (idp) ? idp : config.idp; };
-  const getUrlOrDefault = (url) => { return (url) ? url : config.redirectUri; }
   try {
-    const { name, tokens, email } = await idpClient.login(req.body['code'], getIdpOrDefault(req.body['IDP']), getUrlOrDefault(req.body['redirectUri']));
+    const {url, idp} = config.getIdpAndUrlOrDefault(req.body['IDP'], req.body['redirectUri']);
+    const { name, tokens, email } = await idpClient.login(req.body['code'], idp, url);
     req.session.tokens = tokens;
     if (config.authorization_enabled) {
       await getUserSessionData(req.session, email)

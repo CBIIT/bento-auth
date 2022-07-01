@@ -59,7 +59,17 @@ const config = {
   mysql_database: process.env.MYSQL_DATABASE,
   // Email settings
   email_service_email: process.env.EMAIL_SERVICE_EMAIL,
-  email_transport: getTransportConfig()
+  email_transport: getTransportConfig(),
+  getIdpAndUrlOrDefault: (idp, url) => {
+  // idp, url
+  if (idp && url) return {idp, url};
+  // no idp, url
+  if (!idp && url) return {idp: config.idp, url};
+  // idp, no url
+  if (idp && !url) return {idp: idp, url: getRedirectUri(idp)};
+  // no idp, no url
+  return {idp: config.idp, url: 'http://localhost:4010'};
+  }
 };
 
 function getTransportConfig() {
