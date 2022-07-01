@@ -4,13 +4,14 @@ const idpClient = require('../idps');
 const config = require('../config');
 const {getUserSessionData} = require("../data-management/data-interface");
 const {logout} = require('../controllers/auth-api')
+const IDP = require("../model/idp");
 
 /* Login */
 router.post('/login', async function(req, res, next) {
 
   try {
-    const {url, idp} = config.getIdpAndUrlOrDefault(req.body['IDP'], req.body['redirectUri']);
-    const { name, tokens, email } = await idpClient.login(req.body['code'], idp, url);
+    const idp = IDP.createIDP(req.body['IDP'], req.body['redirectUri']);
+    const { name, tokens, email } = await idpClient.login(req.body['code'], idp.getType(), idp.getUrl());
     req.session.tokens = tokens;
     if (config.authorization_enabled) {
       await getUserSessionData(req.session, email)
