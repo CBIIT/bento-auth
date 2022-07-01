@@ -2,7 +2,7 @@ const dotenv = require('dotenv')
 const {isCaseInsensitiveEqual} = require("./util/string-util");
 dotenv.config();
 
-const GOOGLE = 'GOOGLE'
+const GOOGLE = 'GOOGLE';
 
 const config = {
   version: process.env.VERSION,
