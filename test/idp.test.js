@@ -1,31 +1,22 @@
-const {isCaseInsensitiveEqual} = require('../util/string-util')
 const IDP = require("../model/idp");
-const config = require("../config");
 
 describe('IDP Test', () => {
+
+    const googleRedirectURL = 'localhost:4010/GOOGLE';
+    const nihRedirectURL = 'localhost:4010/NIH'
+    const defaultIDP = 'google';
+    process.env.GOOGLE_REDIRECT_URL = googleRedirectURL;
+    process.env.NIH_REDIRECT_URL = nihRedirectURL;
+    process.env.IDP = defaultIDP;
+
     test('/IDP cases', () => {
-
-        const configIdp = 'login_gov';
-        Object.defineProperty(config, 'idp', {
-            get: jest.fn(() => configIdp)
-        });
-
-        const nihRedirectURL = 'localhost:4010/NIH';
-        Object.defineProperty(config.nih, 'REDIRECT_URL', {
-            get: jest.fn(() => nihRedirectURL)
-        });
-
-        const googleRedirectURL = 'localhost:4010/GOOGLE';
-        Object.defineProperty(config.google, 'REDIRECT_URL', {
-            get: jest.fn(() => googleRedirectURL)
-        });
-
         const tests = [
-            {idp: null, url: null, expectedIdp: configIdp, expectedUrl: 'http://localhost:4010'},
+            // default idp Google, Google redirecting url should return
+            {idp: null, url: null, expectedIdp: defaultIDP, expectedUrl: googleRedirectURL},
             {idp: "NIH", url: null, expectedIdp: 'NIH', expectedUrl: nihRedirectURL},
-            {idp: "GOOGLE", url: 'http://localhost:3000', expectedIdp: 'GOOGLE', expectedUrl: 'http://localhost:3000'},
+            {idp: "LOGIN.GOV", url: 'http://localhost:3000', expectedIdp: 'LOGIN.GOV', expectedUrl: 'http://localhost:3000'},
             {idp: "GOOGLE", url: null, expectedIdp: 'GOOGLE', expectedUrl: googleRedirectURL},
-            {idp: null, url: 'http://localhost:3000', expectedIdp: configIdp, expectedUrl: 'http://localhost:3000'},
+            {idp: null, url: 'http://localhost:3000', expectedIdp: defaultIDP, expectedUrl: 'http://localhost:3000'},
         ];
 
         for (let t of tests) {
@@ -37,18 +28,9 @@ describe('IDP Test', () => {
 
     test('/IDP redirect url test', () => {
 
-        const nihRedirectURL = 'localhost:4010/NIH';
-        Object.defineProperty(config.nih, 'REDIRECT_URL', {
-            get: jest.fn(() => nihRedirectURL)
-        });
-
-        const googleRedirectURL = 'localhost:4010/GOOGLE';
-        Object.defineProperty(config.google, 'REDIRECT_URL', {
-            get: jest.fn(() => googleRedirectURL)
-        });
-
         const tests = [
-            {idp: null, expectedUrl: 'http://localhost:4010'},
+            // by default Google redirecting returns
+            {idp: null, expectedUrl: googleRedirectURL},
             {idp: "GOOGLE", expectedUrl: googleRedirectURL},
             {idp: 'NIH', expectedUrl: nihRedirectURL},
         ];
@@ -59,7 +41,18 @@ describe('IDP Test', () => {
         }
     });
 
+    test('/IDP redirect url test', () => {
+        process.env.GOOGLE_REDIRECT_URL = null;
+        const tests = [
+            // by default Google redirecting returns
+            {idp: null, expectedUrl: 'http://localhost:4010'},
+        ];
 
+        for (let t of tests) {
+            let url = IDP.getRedirectUri(t.idp);
+            expect(url).toBe(t.expectedUrl);
+        }
+    });
 
 
 });

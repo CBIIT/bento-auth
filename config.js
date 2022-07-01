@@ -1,18 +1,6 @@
 const dotenv = require('dotenv')
 const IDP = require("./model/idp");
-const {isCaseInsensitiveEqual} = require("./util/string-util");
 dotenv.config();
-
-const GOOGLE = 'GOOGLE'
-
-function getRedirectUri(idp) {
-  if (isCaseInsensitiveEqual(idp, GOOGLE))
-    return process.env.GOOGLE_REDIRECT_URL;
-  if (isCaseInsensitiveEqual(idp, 'NIH'))
-    return process.env.NIH_REDIRECT_URL;
-
-  return 'http://localhost:4010';
-}
 
 const config = {
   version: process.env.VERSION,
