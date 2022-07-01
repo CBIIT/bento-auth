@@ -30,10 +30,10 @@ router.post('/login', async function (req, res) {
                     req.session.userInfo = {name, email, idp: req.body['IDP'], role: 'None'};
                     res.json({name, email, error});
                 } else {
-                    throw new Error();
+                    throw new Error("No response");
                 }
             } catch (err) {
-                let error = 'Unable to query role'
+                let error = 'Unable to query role: '+err.message;
                 req.session.userInfo = {name, email, idp: req.body['IDP'], role: "None"};
                 res.json({name, email, error});
             }
