@@ -1,4 +1,5 @@
 const {isCaseInsensitiveEqual} = require("../util/string-util");
+const {errorType} = require("../data-management/graphql-api-constants");
 
 const GOOGLE = 'GOOGLE'
 const NIH = 'NIH';
@@ -21,8 +22,20 @@ module.exports = class IDP {
     }
 
     static getRedirectUri(idp) {
-        if (isCaseInsensitiveEqual(idp, NIH)) return process.env.NIH_REDIRECT_URL;
-        // by default Google redirect url
+        const defaultIdp = this.defaultIDP();
+        if (isCaseInsensitiveEqual(idp, NIH)) {
+            if (!process.env.NIH_REDIRECT_URL) {
+                console.error(`Please, set NIH_REDIRECT_URL in environmental variable!`)
+                throw errorType.INVALID_IDP_CONFIGURATION;
+            }
+            return process.env.NIH_REDIRECT_URL;
+        }
+        else if (isCaseInsensitiveEqual(idp, GOOGLE)) {
+            if (!process.env.GOOGLE_REDIRECT_URL && !isCaseInsensitiveEqual(defaultIdp, GOOGLE)) {
+                console.error(`Please, set GOOGLE_REDIRECT_URL in environmental variable!`)
+                throw errorType.INVALID_IDP_CONFIGURATION;
+            }
+        }
         return process.env.GOOGLE_REDIRECT_URL ? process.env.GOOGLE_REDIRECT_URL : 'http://localhost:4010';
     }
 

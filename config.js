@@ -5,8 +5,8 @@ dotenv.config();
 const config = {
   version: process.env.VERSION,
   date: process.env.DATE,
-  idp: process.env.IDP ? process.env.IDP.toLowerCase() : GOOGLE.toLowerCase(),
-  redirectUri: getRedirectUri(process.env.IDP),
+  idp: IDP.defaultIDP(),
+  redirectUri: IDP.getRedirectUri(process.env.IDP),
   cookie_secret: process.env.COOKIE_SECRET,
   session_timeout: process.env.SESSION_TIMEOUT ? parseInt(process.env.SESSION_TIMEOUT) : 30 * 60,  // 30 minutes
   authorization_enabled: process.env.AUTHORIZATION_ENABLED ? process.env.AUTHORIZATION_ENABLED.toLowerCase() === 'true' : true,
@@ -46,17 +46,7 @@ const config = {
   mysql_database: process.env.MYSQL_DATABASE,
   // Email settings
   email_service_email: process.env.EMAIL_SERVICE_EMAIL,
-  email_transport: getTransportConfig(),
-  getIdpAndUrlOrDefault: (idp, url) => {
-  // idp, url
-  if (idp && url) return {idp, url};
-  // no idp, url
-  if (!idp && url) return {idp: config.idp, url};
-  // idp, no url
-  if (idp && !url) return {idp: idp, url: getRedirectUri(idp)};
-  // no idp, no url
-  return {idp: config.idp, url: 'http://localhost:4010'};
-  }
+  email_transport: getTransportConfig()
 };
 
 function getTransportConfig() {

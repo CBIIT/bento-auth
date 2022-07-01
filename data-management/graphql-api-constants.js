@@ -24,6 +24,10 @@ exports.errorType = {
         message: "Invalid IDP, the valid IDPs are the following: " + valid_idps.join(", "),
         statusCode: 400
     },
+    INVALID_IDP_CONFIGURATION: {
+        message: "Invalid IDP Configuration, the valid IDPs ",
+        statusCode: 400
+    },
     USER_NOT_FOUND: {
         message: "The specified user could not be found or does not exist",
         statusCode: 400
