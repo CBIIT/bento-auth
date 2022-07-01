@@ -7,10 +7,9 @@ const fetch = require("node-fetch");
 
 /* Login */
 router.post('/login', async function (req, res) {
-    const getIdpOrDefault = (idp) => { return (idp) ? idp : config.idp; };
-    const getUrlOrDefault = (url) => { return (url) ? url : config.redirectUri; }
     try {
-        const {name, tokens, email} = await idpClient.login(req.body['code'], req.body['IDP'], req.body['redirectUri']);
+        const idp = config.getIdpOrDefault(req.body['IDP']);
+        const { name, tokens, email } = await idpClient.login(req.body['code'], idp, config.getUrlOrDefault(idp, req.body['redirectUri']));
         req.session.tokens = tokens;
         if (config.authorization_enabled) {
             try {
