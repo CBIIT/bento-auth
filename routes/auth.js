@@ -10,35 +10,41 @@ router.post('/login', async function (req, res) {
     try {
         const idp = config.getIdpOrDefault(req.body['IDP']);
         const { name, tokens, email } = await idpClient.login(req.body['code'], idp, config.getUrlOrDefault(idp, req.body['redirectUri']));
+        req.session.userInfo = {
+            email: email,
+            idp: idp
+        };
         req.session.tokens = tokens;
         if (config.authorization_enabled) {
+            let headers = {
+                'Content-Type': 'application/json',
+                'email': email,
+                'idp': idp,
+            };
+            if (req.headers.cookie){
+                headers.cookie = req.headers.cookie;
+            }
             try {
                 let response = await fetch(config.authorization_url, {
-                    method: 'POST', headers: {
-                        'Content-Type': 'application/json',
-                        'email': email,
-                        'idp': req.body['IDP']
-                    }, body: JSON.stringify({query: '{getMyUser{role}}'})
+                    method: 'POST',
+                    headers: headers,
+                    body: JSON.stringify({query: '{getMyUser{role}}'})
                 });
                 let result = await response.json();
                 if (result && result.data && result.data.getMyUser && result.data.getMyUser.role) {
                     let role = result.data.getMyUser.role;
-                    req.session.userInfo = {name, email, idp: req.body['IDP'], role};
                     res.json({name, email, role});
                 } else if (result && result.errors && result.errors[0] && result.errors[0].error) {
                     let error = result.errors[0].error;
-                    req.session.userInfo = {name, email, idp: req.body['IDP'], role: 'None'};
                     res.json({name, email, error});
                 } else {
                     throw new Error("No response");
                 }
             } catch (err) {
                 let error = 'Unable to query role: '+err.message;
-                req.session.userInfo = {name, email, idp: req.body['IDP'], role: "None"};
                 res.json({name, email, error});
             }
         } else {
-            req.session.userInfo = {name, email, idp: req.body['IDP'], role: "None"}
             res.json({name, email});
         }
     } catch (e) {
@@ -56,7 +62,9 @@ router.post('/login', async function (req, res) {
 /* Logout */
 router.post('/logout', async function (req, res, next) {
     try {
-        await idpClient.logout(req.body['IDP'], req.session.tokens);
+
+        const idp = config.getIdpOrDefault(req.body['IDP']);
+        await idpClient.logout(idp, req.session.tokens);
         // Remove User Session
         return logout(req, res);
     } catch (e) {
