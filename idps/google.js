@@ -1,6 +1,6 @@
 const { google } = require('googleapis');
 const config = require('../config');
-
+const UserInfoBuilder = require("../model/user-info");
 
 const oauth2Client = new google.auth.OAuth2(
     config.google.CLIENT_ID,
@@ -16,9 +16,8 @@ const oauth2Client = new google.auth.OAuth2(
             audience: config.google.CLIENT_ID
         });
         const payload = ticket.getPayload();
-        const name = payload.given_name;
-        const email = payload.email;
-        return { name, tokens, email };
+        const userInfo = UserInfoBuilder.createUser(payload.given_name, payload.email);
+        return {tokens, ...userInfo.getUserInfo()};
     },
     authenticated: async (tokens) => {
         try {
