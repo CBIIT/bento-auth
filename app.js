@@ -7,7 +7,6 @@ var logger = require('morgan');
 const fs = require('fs');
 const cors = require('cors');
 const config = require('./config');
-const {createProxyMiddleware, fixRequestBody} = require('http-proxy-middleware');
 console.log(config);
 
 const LOG_FOLDER = 'logs';
