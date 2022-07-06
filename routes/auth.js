@@ -15,38 +15,7 @@ router.post('/login', async function (req, res) {
             idp: idp
         };
         req.session.tokens = tokens;
-        if (config.authorization_enabled) {
-            let headers = {
-                'Content-Type': 'application/json',
-                'email': email,
-                'idp': idp,
-            };
-            if (req.headers.cookie){
-                headers.cookie = req.headers.cookie;
-            }
-            try {
-                let response = await fetch(config.authorization_url, {
-                    method: 'POST',
-                    headers: headers,
-                    body: JSON.stringify({query: '{getMyUser{role}}'})
-                });
-                let result = await response.json();
-                if (result && result.data && result.data.getMyUser && result.data.getMyUser.role) {
-                    let role = result.data.getMyUser.role;
-                    res.json({name, email, role});
-                } else if (result && result.errors && result.errors[0] && result.errors[0].error) {
-                    let error = result.errors[0].error;
-                    res.json({name, email, error});
-                } else {
-                    throw new Error("No response");
-                }
-            } catch (err) {
-                let error = 'Unable to query role: '+err.message;
-                res.json({name, email, error});
-            }
-        } else {
-            res.json({name, email});
-        }
+        res.json({name, email});
     } catch (e) {
         if (e.code && parseInt(e.code)) {
             res.status(e.code);
