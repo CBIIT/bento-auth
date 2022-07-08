@@ -7,7 +7,7 @@ const oauth2Client = {
     login: async (code, idp, redirectingURL) => {
         // if google
         if (isCaseInsensitiveEqual(idp, 'google')) {
-            return googleClient.login(code);
+            return googleClient.login(code, redirectingURL);
         } else if (isCaseInsensitiveEqual(idp,'NIH')) {
             return nihClient.login(code, redirectingURL);
         }
