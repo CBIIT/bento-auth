@@ -2,16 +2,17 @@ const { google } = require('googleapis');
 const config = require('../config');
 
 
-const oauth2Client = new google.auth.OAuth2(
-    config.google.CLIENT_ID,
-    config.google.CLIENT_SECRET,
-    config.google.REDIRECT_URL
-);
+
 
  let client = {
-    login: async (code) => {
-        const {tokens} = await oauth2Client.getToken(code)
-        const ticket = await oauth2Client.verifyIdToken({
+    login: async (code, redirectURL) => {
+        this.oauth2Client = new google.auth.OAuth2(
+            config.google.CLIENT_ID,
+            config.google.CLIENT_SECRET,
+            redirectURL
+        );
+        const {tokens} = await this.oauth2Client.getToken(code)
+        const ticket = await this.oauth2Client.verifyIdToken({
             idToken: tokens.id_token,
             audience: config.google.CLIENT_ID
         });
@@ -23,7 +24,7 @@ const oauth2Client = new google.auth.OAuth2(
     authenticated: async (tokens) => {
         try {
             if (tokens) {
-                const ticket = await oauth2Client.verifyIdToken({
+                const ticket = await this.oauth2Client.verifyIdToken({
                     idToken: tokens.id_token,
                     audience: config.google.CLIENT_ID
                 });
