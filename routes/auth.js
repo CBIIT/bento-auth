@@ -8,8 +8,8 @@ const fetch = require("node-fetch");
 /* Login */
 router.post('/login', async function (req, res) {
     try {
-        const idp = config.getIdpOrDefault(req.body['IDP']);
-        const { name, tokens, email } = await idpClient.login(req.body['code'], idp, config.getUrlOrDefault(idp, req.body['redirectUri']));
+        const reqIDP = config.getIdpOrDefault(req.body['IDP']);
+        const { name, tokens, email, idp } = await idpClient.login(req.body['code'], reqIDP, config.getUrlOrDefault(reqIDP, req.body['redirectUri']));
         req.session.userInfo = {
             email: email,
             idp: idp

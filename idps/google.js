@@ -1,10 +1,8 @@
 const { google } = require('googleapis');
 const config = require('../config');
+const {GOOGLE} = require("../constants/idp-constants");
 
-
-
-
- let client = {
+let client = {
     login: async (code, redirectURL) => {
         this.oauth2Client = new google.auth.OAuth2(
             config.google.CLIENT_ID,
@@ -19,7 +17,7 @@ const config = require('../config');
         const payload = ticket.getPayload();
         const name = payload.given_name;
         const email = payload.email;
-        return { name, tokens, email };
+        return { name, tokens, email, idp: GOOGLE };
     },
     authenticated: async (tokens) => {
         try {
