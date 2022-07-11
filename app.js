@@ -28,9 +28,21 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(createSession({ sessionSecret: config.cookie_secret, session_timeout: config.session_timeout }));
 
-app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/api/auth', authRouter);
+
+if (process.env.NODE_ENV === 'development') {
+  console.log("Running in development mode, local test page enabled");
+  app.set('view engine', 'ejs');
+
+  app.get('/', (req, res) => {
+    res.render('index', {
+      googleClientID: config.google.CLIENT_ID,
+      nihClientID: config.nih.CLIENT_ID
+    });
+  });
+}
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
