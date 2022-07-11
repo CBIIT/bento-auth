@@ -1,10 +1,12 @@
-const {getNIHToken, nihUserInfo, nihLogout} = require("../services/nih-auth");
-
+const {getNIHToken, nihUserInfo, nihLogout, getIDP, isNIHLogin} = require("../services/nih-auth");
 const client = {
     login: async (code, redirectingURL) => {
         const token = await getNIHToken(code, redirectingURL);
         const user = await nihUserInfo(token);
-        return {name: user.first_name, email: user.email, tokens: token};
+        // use a preferred name or email as identity
+        const idp = getIDP(user['preferred_username'] && !isNIHLogin(user.email) ? user['preferred_username'] : user.email);
+        // Leave as blank if no name exits
+        return {name: user.first_name ? user.first_name: '', email: user.email, tokens: token, idp: idp};
     },
     authenticated: async (tokens) => {
         try {
