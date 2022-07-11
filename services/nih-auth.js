@@ -1,5 +1,9 @@
 const nodeFetch = require("node-fetch");
 const config = require("../config");
+const {LOGIN_GOV, NIH} = require("../constants/idp-constants");
+const loginGovRegex = new RegExp(/(?:.){1}(@login.gov){1}\b/i);
+const nihRegex = new RegExp(/(?:.){1}(@nih.gov){1}\b/i);
+
 async function getNIHToken(code, redirectURi) {
     const response = await nodeFetch(config.nih.TOKEN_URL, {
         method: 'POST',
@@ -42,8 +46,26 @@ async function nihUserInfo(accessToken) {
     return result.json();
 }
 
+const getIDP = (email) => {
+    // LOGIN.GOV Login
+    if (isLoginGovLogin(email)) return LOGIN_GOV;
+    // NIH Login
+    if (isNIHLogin(email)) return NIH;
+}
+
+const isNIHLogin = (email)=> {
+    return nihRegex.test(email);
+}
+
+const isLoginGovLogin = (email)=> {
+    return loginGovRegex.test(email);
+}
+
 module.exports = {
     getNIHToken,
     nihLogout,
-    nihUserInfo
+    nihUserInfo,
+    getIDP,
+    isLoginGovLogin,
+    isNIHLogin
 };
