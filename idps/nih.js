@@ -1,16 +1,12 @@
-const {getNIHToken, nihUserInfo, nihLogout} = require("../services/nih-auth");
-const {NIH, LOGIN_GOV} = require("../constants/idp-constants");
-// if a preferred name field exists, it is login.gov.
-const getIDP = (user)=> {
-    return user['preferred_username'] ? LOGIN_GOV : NIH;
-}
-
+const {getNIHToken, nihUserInfo, nihLogout, getIDP, isNIHLogin} = require("../services/nih-auth");
 const client = {
     login: async (code, redirectingURL) => {
         const token = await getNIHToken(code, redirectingURL);
         const user = await nihUserInfo(token);
+        // use a preferred name or email as identity
+        const idp = getIDP(user['preferred_username'] && !isNIHLogin(user.email) ? user['preferred_username'] : user.email);
         // Leave as blank if no name exits
-        return {name: user.first_name ? user.first_name: '', email: user.email, tokens: token, idp: getIDP(user)};
+        return {name: user.first_name ? user.first_name: '', email: user.email, tokens: token, idp: idp};
     },
     authenticated: async (tokens) => {
         try {

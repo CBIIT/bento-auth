@@ -51,6 +51,8 @@ const getIDP = (email) => {
     if (isLoginGovLogin(email)) return LOGIN_GOV;
     // NIH Login
     if (isNIHLogin(email)) return NIH;
+
+    throw new Error("Invalid IDP Exception");
 }
 
 const isNIHLogin = (email)=> {
