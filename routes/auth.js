@@ -9,10 +9,12 @@ const fetch = require("node-fetch");
 router.post('/login', async function (req, res) {
     try {
         const reqIDP = config.getIdpOrDefault(req.body['IDP']);
-        const { name, tokens, email, idp } = await idpClient.login(req.body['code'], reqIDP, config.getUrlOrDefault(reqIDP, req.body['redirectUri']));
+        const { name, lastName, tokens, email, idp } = await idpClient.login(req.body['code'], reqIDP, config.getUrlOrDefault(reqIDP, req.body['redirectUri']));
         req.session.userInfo = {
             email: email,
-            idp: idp
+            idp: idp,
+            firstName: name,
+            lastName: lastName
         };
         req.session.tokens = tokens;
         res.json({name, email});
