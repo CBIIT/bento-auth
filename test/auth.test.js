@@ -1,7 +1,5 @@
 const app = require('../app');
-const config = require("../config");
 const request = require('supertest');
-const nihClient = require("../idps/nih");
 const {NIH, LOGIN_GOV} = require("../constants/idp-constants");
 jest.mock("../idps/nih");
 describe('GET /auth test', ()=> {
