@@ -9,7 +9,7 @@ const oauth2Client = {
         // if google
         if (isCaseInsensitiveEqual(idp, GOOGLE)) {
             return googleClient.login(code, redirectingURL);
-        } else if (isCaseInsensitiveEqual(idp,NIH)) {
+        } else if (isCaseInsensitiveEqual(idp,NIH) || isCaseInsensitiveEqual(idp, LOGIN_GOV)) {
             return nihClient.login(code, redirectingURL);
         }
         else if (isCaseInsensitiveEqual(idp,'test-idp')) {
