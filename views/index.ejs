@@ -52,6 +52,7 @@
             newUrl += `&redirect_uri=http://localhost:4010/profile`;
             newUrl += `&response_type=code`;
             newUrl += `&scope=openid email profile`;
+            newUrl += `&prompt=login`;
             window.location =  newUrl;
         });
         $('#logout').click(function() {
@@ -74,8 +75,6 @@
             let code = params.get("code"); // is the string "Jonathan"
             $('#auth-code').text(code);
         }
-
-
     </script>
 
     <!-- Last part of BODY element in file index.ejs -->
@@ -105,11 +104,12 @@
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json'
-                }
+                },
+                body: JSON.stringify({IDP: 'nih' })
             });
             const content = await rawResponse.json();
-
             console.log(content);
+            if (content.status === 'success') $('#login_text').text('Not logged in');
         }
         async function authenticated() {
             const queryString = window.location.search;
