@@ -49,7 +49,7 @@
             // signInCallback defined in step 6.
             let newUrl = "https://stsstg.nih.gov/auth/oauth/v2/authorize?";
             newUrl += `client_id=<%= nihClientID %>`;
-            newUrl += `&redirect_uri=http://localhost:4010`;
+            newUrl += `&redirect_uri=http://localhost:4010/profile`;
             newUrl += `&response_type=code`;
             newUrl += `&scope=openid email profile`;
             window.location =  newUrl;
@@ -83,16 +83,7 @@
         function signInDisplayCode(authResult) {
             if (authResult['code']) {
                 $("#auth-code").text(authResult['code']);
-            }
-        };
-
-        function signInCallback(authResult) {
-            if (authResult['code']) {
-
-                // Hide the sign-in button now that the user is authorized, for example:
-                $('#signInBtnGoogle').attr('style', 'display: none');
-
-                // Send the code to the server
+                // Google login with authenticated code
                 (async () => {
                     const rawResponse = await fetch('/api/auth/login/', {
                         method: 'POST',
@@ -103,11 +94,9 @@
                         body: JSON.stringify({code: authResult['code']})
                     });
                     const content = await rawResponse.json();
-
                     console.log(content);
+                    $('#login_text').text(content.email.includes('@gmail.com') ? 'Google ' + content.name + ' Logged in': 'Not logged in');
                 })();
-            } else {
-                // There was an error.
             }
         }
         async function signOut() {
@@ -123,23 +112,32 @@
             console.log(content);
         }
         async function authenticated() {
-            const rawResponse = await fetch('/api/auth/authenticated/', {
+            const queryString = window.location.search;
+            const urlParams = new URLSearchParams(queryString);
+            if (!urlParams.get('code') && !urlParams.get('type')) return;
+            const auth_type = urlParams.get('type');
+            // NIH LOGIN or Bypass Login.gov
+            if (auth_type === 'nih') await nihLogin(urlParams.get('code'))
+        }
+
+        async function nihLogin(auth_code) {
+            console.log('auth_code: ' + auth_code);
+            fetch(`/api/auth/login`, {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                }
-            });
-            const content = await rawResponse.json();
-            if (content.status) {
-                $('#login_text').text("Logged in");
-            } else {
-                $('#login_text').text("Not logged in");
-            }
-
-
-            console.log(content);
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({code: auth_code, IDP: 'nih'})
+            })
+                .then(response => response.json())
+                .then((responseData) => {
+                    console.log(JSON.stringify(responseData));
+                    const idp = responseData.email && responseData.email.includes('@nih.gov') ?  'NIH ': 'Login.gov ';
+                    $('#login_text').text(responseData.email ?  idp + responseData.name + ' Logged in': 'Not logged in');
+                })
         }
+
         async function requestFile() {
             const rawResponse = await fetch('/api/auth/files/BENTO-FILE-217910', {
                 method: 'GET',
@@ -152,6 +150,9 @@
             const content = await rawResponse.json();
             console.log(content);
         }
+    </script>
+    <script type="text/javascript">
+        window.onload = authenticated;
     </script>
 </body>
 </html>
