@@ -6,7 +6,7 @@ const client = {
         // use a preferred name or email as identity
         const idp = getIDP(user['preferred_username'] && !isNIHLogin(user.email) ? user['preferred_username'] : user.email);
         // Leave as blank if no name exits
-        return {name: user.first_name ? user.first_name: '', email: user.email, tokens: token, idp: idp};
+        return {name: user.first_name ? user.first_name: '', lastName: user.last_name ? user.last_name: '', email: user.email, tokens: token, idp: idp};
     },
     authenticated: async (tokens) => {
         try {
