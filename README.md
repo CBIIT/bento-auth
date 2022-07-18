@@ -46,4 +46,6 @@ Following environmental variables are needed
 - NIH_TOKEN_URL: NIH API address to create token for login
 - NIH_LOGOUT_URL: NIH API address to invalidate token for logout
 - NIH_SCOPE: space-separated lists of identifiers to specify access privileges
-- NIH_PROMPT: 
+- NIH_PROMPT: to force re-authorization event when a current session is still active
+# Local development configuration
+- NODE_ENV: If set to "development", a test html page will be activated in the route "/"
