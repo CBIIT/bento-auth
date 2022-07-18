@@ -38,7 +38,9 @@ if (process.env.NODE_ENV === 'development') {
   app.get('/', (req, res) => {
     res.render('index', {
       googleClientID: config.google.CLIENT_ID,
-      nihClientID: config.nih.CLIENT_ID
+      nihClientID: config.nih.CLIENT_ID,
+      nihRedirectURL: config.nih.REDIRECT_URL,
+      noAutoLogin: config.noAutoLogin
     });
   });
 }

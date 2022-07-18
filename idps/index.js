@@ -12,7 +12,7 @@ const oauth2Client = {
         } else if (isCaseInsensitiveEqual(idp,NIH) || isCaseInsensitiveEqual(idp, LOGIN_GOV)) {
             return nihClient.login(code, redirectingURL);
         }
-        else if (isCaseInsensitiveEqual(idp,'test-idp')) {
+        else if (isCaseInsensitiveEqual(idp,'test-idp') && process.env.NODE_ENV === 'development') {
             return testIDP.login();
         }
     },
