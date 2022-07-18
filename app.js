@@ -34,8 +34,6 @@ app.use('/api/auth', authRouter);
 if (process.env.NODE_ENV === 'development') {
   console.log("Running in development mode, local test page enabled");
   app.set('view engine', 'ejs');
-  const nihRouter = require('./routes/local-test-auth');
-  app.use(nihRouter);
   app.get('/', (req, res) => {
     res.render('index', {
       googleClientID: config.google.CLIENT_ID,

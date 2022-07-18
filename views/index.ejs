@@ -49,7 +49,7 @@
             // signInCallback defined in step 6.
             let newUrl = "https://stsstg.nih.gov/auth/oauth/v2/authorize?";
             newUrl += `client_id=<%= nihClientID %>`;
-            newUrl += `&redirect_uri=http://localhost:4010/profile`;
+            newUrl += `&redirect_uri=http://localhost:4010`;
             newUrl += `&response_type=code`;
             newUrl += `&scope=openid email profile`;
             newUrl += `&prompt=login`;
@@ -114,10 +114,8 @@
         async function authenticated() {
             const queryString = window.location.search;
             const urlParams = new URLSearchParams(queryString);
-            if (!urlParams.get('code') && !urlParams.get('type')) return;
-            const auth_type = urlParams.get('type');
-            // NIH LOGIN or Bypass Login.gov
-            if (auth_type === 'nih') await nihLogin(urlParams.get('code'))
+            if (!urlParams.get('code')) return;
+            await nihLogin(urlParams.get('code'));
         }
 
         async function nihLogin(auth_code) {
@@ -133,8 +131,7 @@
                 .then(response => response.json())
                 .then((responseData) => {
                     console.log(JSON.stringify(responseData));
-                    const idp = responseData.email && responseData.email.includes('@nih.gov') ?  'NIH ': 'Login.gov ';
-                    $('#login_text').text(responseData.email ?  idp + responseData.name + ' Logged in': 'Not logged in');
+                    $('#login_text').text(responseData.email ? responseData.name + ' Logged in': 'Not logged in');
                 })
         }
 
