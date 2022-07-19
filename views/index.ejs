@@ -49,7 +49,7 @@
             // signInCallback defined in step 6.
             let newUrl = "https://stsstg.nih.gov/auth/oauth/v2/authorize?";
             newUrl += `client_id=<%= nihClientID %>`;
-            newUrl += `&redirect_uri=http://localhost:4010`;
+            newUrl += `&redirect_uri=<%= nihRedirectURL %>`;
             newUrl += `&response_type=code`;
             newUrl += `&scope=openid email profile`;
             newUrl += `&prompt=login`;
@@ -83,19 +83,21 @@
             if (authResult['code']) {
                 $("#auth-code").text(authResult['code']);
                 // Google login with authenticated code
-                (async () => {
-                    const rawResponse = await fetch('/api/auth/login/', {
-                        method: 'POST',
-                        headers: {
-                            'Accept': 'application/json',
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({code: authResult['code']})
-                    });
-                    const content = await rawResponse.json();
-                    console.log(content);
-                    $('#login_text').text(content.email.includes('@gmail.com') ? 'Google ' + content.name + ' Logged in': 'Not logged in');
-                })();
+              if (!noAutoLogin) {
+                  (async () => {
+                      const rawResponse = await fetch('/api/auth/login/', {
+                          method: 'POST',
+                          headers: {
+                              'Accept': 'application/json',
+                              'Content-Type': 'application/json'
+                          },
+                          body: JSON.stringify({code: authResult['code']})
+                      });
+                      const content = await rawResponse.json();
+                      console.log(content);
+                      $('#login_text').text(content.email.includes('@gmail.com') ? 'Google ' + content.name + ' Logged in' : 'Not logged in');
+                  })();
+              }
             }
         }
         async function signOut() {
@@ -149,7 +151,10 @@
         }
     </script>
     <script type="text/javascript">
-        window.onload = authenticated;
+        var noAutoLogin = <%= noAutoLogin %>
+        if (!noAutoLogin) {
+            window.onload = authenticated;
+        }
     </script>
 </body>
 </html>
