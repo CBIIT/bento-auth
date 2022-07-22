@@ -9,7 +9,7 @@ const client = {
             // Leave as blank if no name exits
             return {name: user.first_name ? user.first_name: '', lastName: user.last_name ? user.last_name: '', email: user.email, tokens: token, idp: idp};
         } catch {
-            throw new Error("Invalid NIH access token or unauthorized NIH login attempt");
+            throw new Error("Invalid access NIH token or unauthorized NIH login attempt");
         }
     },
     authenticated: async (tokens) => {
