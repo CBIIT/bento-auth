@@ -4,6 +4,10 @@ const {LOGIN_GOV, NIH} = require("../constants/idp-constants");
 const loginGovRegex = new RegExp(/(?:.){1}(@login.gov){1}\b/i);
 const nihRegex = new RegExp(/(?:.){1}(@nih.gov){1}\b/i);
 
+const validateResponseOrThrow= (res)=> {
+    if (res.status != 200) throw new Error("NIH access token failed to create because of invalid access code or unauthorized access");
+}
+
 async function getNIHToken(code, redirectURi) {
     const response = await nodeFetch(config.nih.TOKEN_URL, {
         method: 'POST',
@@ -20,6 +24,7 @@ async function getNIHToken(code, redirectURi) {
         })
     });
     const jsonResponse = await response.json();
+    validateResponseOrThrow(response);
     return jsonResponse.access_token;
 }
 
