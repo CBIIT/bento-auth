@@ -1,35 +1,59 @@
 const dotenv = require('dotenv')
+const {isCaseInsensitiveEqual} = require("./util/string-util");
 dotenv.config();
+
+const GOOGLE = 'GOOGLE';
 
 const config = {
   version: process.env.VERSION,
   date: process.env.DATE,
-  idp: process.env.IDP ? process.env.IDP.toLowerCase() : 'google',
-  client_id: process.env.CLIENT_ID,
-  client_secret: process.env.CLIENT_SECRET,
-  redirect_url: process.env.REDIRECT_URL,
+  idp: process.env.IDP ? process.env.IDP.toLowerCase() : GOOGLE.toLowerCase(),
   cookie_secret: process.env.COOKIE_SECRET,
-  session_timeout: process.env.SESSION_TIMEOUT ? parseInt(process.env.SESSION_TIMEOUT) : 30 * 60,  // 30 minutes
-  authorization_enabled: process.env.AUTHORIZATION_ENABLED ? process.env.AUTHORIZATION_ENABLED.toLowerCase() === 'true' : true,
-  emails_enabled: process.env.EMAILS_ENABLED ? process.env.EMAILS_ENABLED.toLowerCase() === 'true' : true,
+  session_timeout: process.env.SESSION_TIMEOUT ? parseInt(process.env.SESSION_TIMEOUT) * 1000 : 1000 * 30 * 60,  // 30 minutes
 
-  //Neo4j connection
-  NEO4J_URI: process.env.NEO4J_URI,
-  NEO4J_USER: process.env.NEO4J_USER,
-  NEO4J_PASSWORD: process.env.NEO4J_PASSWORD,
-  //Initial database loading
-  DATA_LOADING_MODE: process.env.DATA_LOADING_MODE,
-  DATA_FILE: process.env.DATA_FILE,
-  //Testing
+  // Testing
   TEST_EMAIL: process.env.TEST_EMAIL,
+
+  // Google login settings
+  google: {
+    CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
+    CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
+    REDIRECT_URL: process.env.GOOGLE_REDIRECT_URL,
+  },
+
+  // NIH login settings
+  nih: {
+    CLIENT_ID: process.env.NIH_CLIENT_ID,
+    CLIENT_SECRET: process.env.NIH_CLIENT_SECRET,
+    BASE_URL: process.env.NIH_BASE_URL,
+    REDIRECT_URL: process.env.NIH_REDIRECT_URL,
+    USERINFO_URL: process.env.NIH_USERINFO_URL,
+    AUTHORIZE_URL: process.env.NIH_AUTHORIZE_URL,
+    TOKEN_URL: process.env.NIH_TOKEN_URL,
+    LOGOUT_URL: process.env.NIH_LOGOUT_URL,
+    SCOPE: process.env.NIH_SCOPE,
+    PROMPT: process.env.NIH_PROMPT
+  },
+
   // MySQL Session
   mysql_host: process.env.MYSQL_HOST,
   mysql_port: process.env.MYSQL_PORT,
   mysql_user: process.env.MYSQL_USER,
   mysql_password: process.env.MYSQL_PASSWORD,
   mysql_database: process.env.MYSQL_DATABASE,
-  // Email settings
-  email_transport: getTransportConfig()
+
+  // Disable local test page automatically sends /login request, so Postman can use the auth code
+  noAutoLogin: process.env.NO_AUTO_LOGIN ? process.env.NO_AUTO_LOGIN.toLowerCase() === "true" : false,
+
+  getIdpOrDefault: (idp) => {
+    return (idp) ? idp : config.idp;
+  },
+  getUrlOrDefault: (idp, url) => {
+    // if (url) return url;
+    if (!url && isCaseInsensitiveEqual(idp,'GOOGLE')) return process.env.GOOGLE_REDIRECT_URL;
+    if (!url && isCaseInsensitiveEqual(idp,'NIH')) return process.env.NIH_REDIRECT_URL;
+    return url;
+  }
 };
 
 function getTransportConfig() {
@@ -47,6 +71,7 @@ function getTransportConfig() {
     )
   };
 }
+
 
 if (!config.version) {
   config.version = 'Version not set'

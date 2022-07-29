@@ -1,31 +1,30 @@
 const { google } = require('googleapis');
 const config = require('../config');
+const {GOOGLE} = require("../constants/idp-constants");
 
-
-const oauth2Client = new google.auth.OAuth2(
-    config.client_id,
-    config.client_secret,
-    config.redirect_url
-);
-
- let client = {
-    login: async (code) => {
-        const {tokens} = await oauth2Client.getToken(code)
-        const ticket = await oauth2Client.verifyIdToken({
+let client = {
+    login: async (code, redirectURL) => {
+        this.oauth2Client = new google.auth.OAuth2(
+            config.google.CLIENT_ID,
+            config.google.CLIENT_SECRET,
+            redirectURL
+        );
+        const {tokens} = await this.oauth2Client.getToken(code)
+        const ticket = await this.oauth2Client.verifyIdToken({
             idToken: tokens.id_token,
-            audience: config.client_id
+            audience: config.google.CLIENT_ID
         });
         const payload = ticket.getPayload();
         const name = payload.given_name;
         const email = payload.email;
-        return { name, tokens, email };
+        return { name, lastName: payload.family_name, tokens, email, idp: GOOGLE};
     },
     authenticated: async (tokens) => {
         try {
             if (tokens) {
-                const ticket = await oauth2Client.verifyIdToken({
+                const ticket = await this.oauth2Client.verifyIdToken({
                     idToken: tokens.id_token,
-                    audience: config.client_id
+                    audience: config.google.CLIENT_ID
                 });
                 const payload = ticket.getPayload();
                 return true;
