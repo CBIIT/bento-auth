@@ -11,9 +11,6 @@ const config = {
   cookie_secret: process.env.COOKIE_SECRET,
   session_timeout: process.env.SESSION_TIMEOUT ? parseInt(process.env.SESSION_TIMEOUT) * 1000 : 1000 * 30 * 60,  // 30 minutes
 
-  // Testing
-  TEST_EMAIL: process.env.TEST_EMAIL,
-
   // Google login settings
   google: {
     CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
