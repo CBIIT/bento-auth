@@ -25,9 +25,7 @@ const getTTL = (req, res) => {
                     response = createTTLErrorResponse("An error occurred while querying the database, see logs for details");
                 }
                 else if (!rows || !rows[0] || !rows[0].expires){
-                    const message = "Session not found in database";
-                    console.log(message);
-                    response = createTTLErrorResponse(message);
+                    response = createTTLResponse(0);
                 }
                 else{
                     let expires = rows[0].expires;
@@ -60,9 +58,7 @@ function createTTLResponse(ttl, error){
 
 function getSessionIDFromCookie(req, res){
     if (!req || !req.cookies || !req.cookies["connect.sid"]){
-        const message = "Cannot parse the session ID from request cookies";
-        console.log("message")
-        const response = createTTLErrorResponse(message);
+        const response = createTTLResponse(0);
         res.json(response);
         return null;
     }
