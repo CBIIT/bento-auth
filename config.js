@@ -32,6 +32,11 @@ const config = {
     PROMPT: process.env.NIH_PROMPT
   },
 
+  // Neo4j Connection
+  neo4j_uri: process.env.NEO4J_URI,
+  neo4j_user: process.env.NEO4J_USER,
+  neo4j_password: process.env.NEO4J_PASSWORD,
+
   // MySQL Session
   mysql_host: process.env.MYSQL_HOST,
   mysql_port: process.env.MYSQL_PORT,
