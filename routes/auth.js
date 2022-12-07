@@ -18,9 +18,9 @@ router.post('/login', async function (req, res) {
             firstName: name,
             lastName: lastName
         };
+        await storeLoginEvent(email, idp);
         req.session.tokens = tokens;
         res.json({name, email, "timeout": config.session_timeout / 1000});
-        await storeLoginEvent(email, idp);
     } catch (e) {
         if (e.code && parseInt(e.code)) {
             res.status(e.code);
