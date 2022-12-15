@@ -3,9 +3,7 @@ const router = express.Router();
 const idpClient = require('../idps');
 const config = require('../config');
 const {logout} = require('../controllers/auth-api')
-const fetch = require("node-fetch");
-const {storeLoginEvent} = require("../neo4j/neo4j-operations");
-const {getLastLogin} = require("../bento-event-logging/neo4j/neo4j-operations");
+const {storeLoginEvent, storeLogoutEvent} = require("../neo4j/neo4j-operations");
 
 /* Login */
 router.post('/login', async function (req, res) {
@@ -38,6 +36,8 @@ router.post('/logout', async function (req, res, next) {
     try {
         const idp = config.getIdpOrDefault(req.body['IDP']);
         await idpClient.logout(idp, req.session.tokens);
+        let userInfo = req.session.userInfo;
+        await storeLogoutEvent(userInfo.email, userInfo.idp);
         // Remove User Session
         return logout(req, res);
     } catch (e) {

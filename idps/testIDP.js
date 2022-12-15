@@ -1,4 +1,3 @@
-const config = require('../config');
 const {TEST} = require("../constants/idp-constants");
 
 module.exports = {
