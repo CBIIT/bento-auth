@@ -52,15 +52,4 @@ function getSessionIDFromCookie(req, res){
     }
 }
 
-const getPing = (req, res) => {
-    res.send(`pong`);
-}
-const getVersion = (req, res) => {
-    res.json({
-        version: config.version, date: config.date
-    });
-}
-
 exports.getTTL = getTTL;
-exports.getPing = getPing;
-exports.getVersion = getVersion;
