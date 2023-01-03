@@ -12,7 +12,7 @@ router.post('/login', async function (req, res) {
         const { name, lastName, tokens, email, idp } = await idpClient.login(req.body['code'], reqIDP, config.getUrlOrDefault(reqIDP, req.body['redirectUri']));
         req.session.userInfo = {
             email: email,
-            idp: idp,
+            IDP: idp,
             firstName: name,
             lastName: lastName
         };
@@ -37,7 +37,7 @@ router.post('/logout', async function (req, res, next) {
         const idp = config.getIdpOrDefault(req.body['IDP']);
         await idpClient.logout(idp, req.session.tokens);
         let userInfo = req.session.userInfo;
-        await storeLogoutEvent(userInfo.email, userInfo.idp);
+        await storeLogoutEvent(userInfo.email, userInfo.IDP);
         // Remove User Session
         return logout(req, res);
     } catch (e) {
