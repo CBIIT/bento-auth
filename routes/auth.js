@@ -23,9 +23,9 @@ router.post('/login', async function (req, res) {
         res.json({name, email, "timeout": config.session_timeout / 1000});
     } catch (e) {
         if (e.code && parseInt(e.code)) {
-            res.status(e.code);
+            res.status(parseInt(e.code));
         } else if (e.statusCode && parseInt(e.statusCode)) {
-            res.status(e.statusCode);
+            res.status(parseInt(e.statusCode));
         } else {
             res.status(500);
         }
