@@ -11,9 +11,6 @@ const config = {
   cookie_secret: process.env.COOKIE_SECRET,
   session_timeout: process.env.SESSION_TIMEOUT ? parseInt(process.env.SESSION_TIMEOUT) * 1000 : 1000 * 30 * 60,  // 30 minutes
 
-  // Testing
-  TEST_EMAIL: process.env.TEST_EMAIL,
-
   // Google login settings
   google: {
     CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
@@ -34,6 +31,11 @@ const config = {
     SCOPE: process.env.NIH_SCOPE,
     PROMPT: process.env.NIH_PROMPT
   },
+
+  // Neo4j Connection
+  neo4j_uri: process.env.NEO4J_URI,
+  neo4j_user: process.env.NEO4J_USER,
+  neo4j_password: process.env.NEO4J_PASSWORD,
 
   // MySQL Session
   mysql_host: process.env.MYSQL_HOST,

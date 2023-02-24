@@ -1,13 +1,13 @@
-const config = require('../config');
+const {TEST} = require("../constants/idp-constants");
 
 module.exports = {
-    login: (_) => {
+    login: (email) => {
         const tokens = {
             idToken: 'test id token'
         };
-        const name = 'Test Name';
-        const email = config.TEST_EMAIL;
-        return {name, tokens, email};
+        const name = 'Test First';
+        const lastName= 'Test Last';
+        return {name, lastName, tokens, email, idp: TEST};
     },
     authenticated: (tokens) => {
         return (tokens.idToken === 'test id token');

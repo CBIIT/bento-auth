@@ -3,4 +3,5 @@ module.exports = Object.freeze({
     GOOGLE: 'google',
     LOGIN_GOV: 'login.gov',
     NIH: 'nih',
+    TEST: 'test-idp'
 });

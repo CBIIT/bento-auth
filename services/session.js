@@ -16,7 +16,7 @@ function createSession({ sessionSecret, session_timeout } = {}) {
           user: config.mysql_user,
           password: config.mysql_password,
           database: config.mysql_database,
-          checkExpirationInterval: 10,
+          checkExpirationInterval: 10 * 1000, // 10 seconds
           expiration: session_timeout
         })
     });
