@@ -8,11 +8,11 @@ const createToken = async (userInfo)=> {
 }
 
 const verifyToken = async (token) => {
-    let status = false;
+    let isValid = false;
     jwt.verify(token, config.token_secret, (error, _) => {
-        if (!error) status = true;
+        if (!error) isValid = true;
     });
-    return status;
+    return isValid;
 }
 
 module.exports = {

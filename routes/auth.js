@@ -13,15 +13,18 @@ router.post(['/login', '/token-login'], async function (req, res) {
     try {
         const reqIDP = config.getIdpOrDefault(req.body['IDP']);
         const { name, lastName, tokens, email, idp } = await idpClient.login(req.body['code'], reqIDP, config.getUrlOrDefault(reqIDP, req.body['redirectUri']));
-        let userInfo = {
+        const userInfo = formatVariables({
             email: email,
             IDP: idp,
             firstName: name,
             lastName: lastName
+        }, ["IDP"], formatMap);
+
+        if (!req.originalUrl.includes("/token-login")) {
+            req.session.userInfo = userInfo
+            req.session.tokens = tokens;
         }
-        req.session.userInfo = formatVariables(userInfo, ["IDP"], formatMap);
-        await storeLoginEvent(req.session.userInfo.email, req.session.userInfo.IDP);
-        req.session.tokens = tokens;
+        await storeLoginEvent(userInfo.email, userInfo.IDP);
         res.json({name, email, accessToken: await createToken(userInfo), "timeout": config.session_timeout / 1000});
     } catch (e) {
         if (e.code && parseInt(e.code)) {
@@ -54,9 +57,12 @@ router.post('/logout', async function (req, res, next) {
 // Return {status: true} or {status: false}
 router.post('/authenticated', async (req, res, _) => {
     try {
-        const auth = req.headers['authorization'];
-        const token = auth && auth.split(' ')[1];
-        const status = await verifyToken(token);
+        const isValidToken = async () => {
+            const auth = req.headers['authorization'];
+            const token = auth && auth.split(' ')[1];
+            return await verifyToken(token);
+        }
+        const status = req.session.tokens ? true : await isValidToken();
         res.status(200).send({ status });
     } catch (e) {
         console.log(e);
