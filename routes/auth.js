@@ -5,7 +5,7 @@ const config = require('../config');
 const {logout} = require('../controllers/auth-api')
 const {storeLoginEvent, storeLogoutEvent} = require("../neo4j/neo4j-operations");
 const {formatVariables, formatMap} = require("../bento-event-logging/const/format-constants");
-const {createToken, verifyToken, verifyTokenCallback} = require("../services/tokenizer");
+const {createToken, verifyToken} = require("../services/tokenizer");
 
 /* Login */
 /* Granting an authenticated token */
@@ -13,16 +13,16 @@ router.post(['/login', '/token-login'], async function (req, res) {
     try {
         const reqIDP = config.getIdpOrDefault(req.body['IDP']);
         const { name, lastName, tokens, email, idp } = await idpClient.login(req.body['code'], reqIDP, config.getUrlOrDefault(reqIDP, req.body['redirectUri']));
-        req.session.userInfo = {
+        let userInfo = {
             email: email,
             IDP: idp,
             firstName: name,
             lastName: lastName
-        };
-        req.session.userInfo = formatVariables(req.session.userInfo, ["IDP"], formatMap);
+        }
+        req.session.userInfo = formatVariables(userInfo, ["IDP"], formatMap);
         await storeLoginEvent(req.session.userInfo.email, req.session.userInfo.IDP);
-        req.session.tokens = req.originalUrl.includes("/token-login") ? await createToken() : tokens;
-        res.json({name, email, "timeout": config.session_timeout / 1000});
+        req.session.tokens = tokens;
+        res.json({name, email, accessToken: await createToken(userInfo), "timeout": config.session_timeout / 1000});
     } catch (e) {
         if (e.code && parseInt(e.code)) {
             res.status(parseInt(e.code));
@@ -54,12 +54,10 @@ router.post('/logout', async function (req, res, next) {
 // Return {status: true} or {status: false}
 router.post('/authenticated', async (req, res, _) => {
     try {
-        if (req.session.tokens) {
-            await verifyToken(req.session.tokens, verifyTokenCallback);
-            res.status(200).send({status: true});
-        } else {
-            res.status(200).send({status: false});
-        }
+        const auth = req.headers['authorization'];
+        const token = auth && auth.split(' ')[1];
+        const status = await verifyToken(token);
+        res.status(200).send({ status });
     } catch (e) {
         console.log(e);
         res.status(500).json({errors: e});
