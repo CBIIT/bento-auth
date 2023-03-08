@@ -5,9 +5,11 @@ const config = require('../config');
 const {logout} = require('../controllers/auth-api')
 const {storeLoginEvent, storeLogoutEvent} = require("../neo4j/neo4j-operations");
 const {formatVariables, formatMap} = require("../bento-event-logging/const/format-constants");
+const {createToken, verifyToken, verifyTokenCallback} = require("../services/tokenizer");
 
 /* Login */
-router.post('/login', async function (req, res) {
+/* Granting an authenticated token */
+router.post(['/login', '/token-login'], async function (req, res) {
     try {
         const reqIDP = config.getIdpOrDefault(req.body['IDP']);
         const { name, lastName, tokens, email, idp } = await idpClient.login(req.body['code'], reqIDP, config.getUrlOrDefault(reqIDP, req.body['redirectUri']));
@@ -19,7 +21,7 @@ router.post('/login', async function (req, res) {
         };
         req.session.userInfo = formatVariables(req.session.userInfo, ["IDP"], formatMap);
         await storeLoginEvent(req.session.userInfo.email, req.session.userInfo.IDP);
-        req.session.tokens = tokens;
+        req.session.tokens = req.originalUrl.includes("/token-login") ? await createToken() : tokens;
         res.json({name, email, "timeout": config.session_timeout / 1000});
     } catch (e) {
         if (e.code && parseInt(e.code)) {
@@ -50,13 +52,13 @@ router.post('/logout', async function (req, res, next) {
 
 /* Authenticated */
 // Return {status: true} or {status: false}
-// Calling this API will refresh the session
-router.post('/authenticated', async function (req, res, next) {
+router.post('/authenticated', async (req, res, _) => {
     try {
         if (req.session.tokens) {
-            return res.status(200).send({status: true});
+            await verifyToken(req.session.tokens, verifyTokenCallback);
+            res.status(200).send({status: true});
         } else {
-            return res.status(200).send({status: false});
+            res.status(200).send({status: false});
         }
     } catch (e) {
         console.log(e);
