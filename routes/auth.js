@@ -20,12 +20,14 @@ router.post(['/login', '/token-login'], async function (req, res) {
             lastName: lastName
         }, ["IDP"], formatMap);
 
+        let timeout = config.token_timeout;
         if (!req.originalUrl.includes("/token-login")) {
             req.session.userInfo = userInfo
             req.session.tokens = tokens;
+            timeout = config.session_timeout / 1000;
         }
         await storeLoginEvent(userInfo.email, userInfo.IDP);
-        res.json({name, email, accessToken: await createToken(userInfo), "timeout": config.session_timeout / 1000});
+        res.json({name, email, timeout, ...(!req.session.userInfo) && {accessToken: await createToken(userInfo)}});
     } catch (e) {
         if (e.code && parseInt(e.code)) {
             res.status(parseInt(e.code));
