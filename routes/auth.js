@@ -59,11 +59,7 @@ router.post('/authenticated', async (req, res, _) => {
     try {
         const auth = req.headers['authorization']
         const token = auth && auth.split(' ')[1];
-        let status = false;
-        if (token) status = await verifyToken(token);
-        else {
-            if (req.session.tokens) status = true;
-        }
+        const status = Boolean((token && await verifyToken(token)) || (!token && req.session.tokens));
         res.status(200).send({ status });
     } catch (e) {
         console.log(e);
