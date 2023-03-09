@@ -57,12 +57,13 @@ router.post('/logout', async function (req, res, next) {
 // Return {status: true} or {status: false}
 router.post('/authenticated', async (req, res, _) => {
     try {
-        const isValidToken = async () => {
-            const auth = req.headers['authorization'];
-            const token = auth && auth.split(' ')[1];
-            return await verifyToken(token);
+        const auth = req.headers['authorization']
+        const token = auth && auth.split(' ')[1];
+        let status = false;
+        if (token) status = await verifyToken(token);
+        else {
+            if (req.session.tokens) status = true;
         }
-        const status = req.session.tokens ? true : await isValidToken();
         res.status(200).send({ status });
     } catch (e) {
         console.log(e);
