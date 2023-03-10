@@ -8,6 +8,8 @@ Following environmental variables are needed
 - IDP : default identification provider, enabled if IDP is not provided from the client side e.g., "google" 
 - COOKIE_SECRET : secret used to sign cookies
 - SESSION_TIMEOUT : session timeout in seconds, default is 30 minutes
+- TOKEN_SECRET : secret used to sign tokens
+- TOKEN_TIMEOUT : token timeout in seconds, default is 30 minutes
 
 # Neo4j configuration
 - NEO4J_URI: Bolt URI of the Neo4j database

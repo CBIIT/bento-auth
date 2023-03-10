@@ -16,6 +16,7 @@
     "googleapis": "^95.0.0",
     "http-errors": "~1.6.3",
     "http-proxy-middleware": "^2.0.6",
+    "jsonwebtoken": "^9.0.0",
     "morgan": "~1.9.1",
     "mysql": "^2.18.1",
     "neo4j-driver": "^5.5.0",
