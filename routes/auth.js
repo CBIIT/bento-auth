@@ -5,29 +5,23 @@ const config = require('../config');
 const {logout} = require('../controllers/auth-api')
 const {storeLoginEvent, storeLogoutEvent} = require("../neo4j/neo4j-operations");
 const {formatVariables, formatMap} = require("../bento-event-logging/const/format-constants");
-const {createToken, verifyToken} = require("../services/tokenizer");
 
 /* Login */
 /* Granting an authenticated token */
-router.post(['/login', '/token-login'], async function (req, res) {
+router.post('/login', async function (req, res) {
     try {
         const reqIDP = config.getIdpOrDefault(req.body['IDP']);
         const { name, lastName, tokens, email, idp } = await idpClient.login(req.body['code'], reqIDP, config.getUrlOrDefault(reqIDP, req.body['redirectUri']));
-        const userInfo = formatVariables({
+        req.session.userInfo = {
             email: email,
             IDP: idp,
             firstName: name,
             lastName: lastName
-        }, ["IDP"], formatMap);
-
-        let timeout = config.token_timeout;
-        if (!req.originalUrl.includes("/token-login")) {
-            req.session.userInfo = userInfo
-            req.session.tokens = tokens;
-            timeout = config.session_timeout / 1000;
-        }
-        await storeLoginEvent(userInfo.email, userInfo.IDP);
-        res.json({name, email, timeout, ...(!req.session.userInfo) && {accessToken: await createToken(userInfo)}});
+        };
+        req.session.userInfo = formatVariables(req.session.userInfo, ["IDP"], formatMap);
+        await storeLoginEvent(req.session.userInfo.email, req.session.userInfo.IDP);
+        req.session.tokens = tokens;
+        res.json({name, email, "timeout": config.session_timeout / 1000});
     } catch (e) {
         if (e.code && parseInt(e.code)) {
             res.status(parseInt(e.code));
@@ -57,12 +51,14 @@ router.post('/logout', async function (req, res, next) {
 
 /* Authenticated */
 // Return {status: true} or {status: false}
-router.post('/authenticated', async (req, res, _) => {
+// Calling this API will refresh the session
+router.post('/authenticated', async function (req, res) {
     try {
-        const auth = req.headers['authorization']
-        const token = auth && auth.split(' ')[1];
-        const status = Boolean((token && await verifyToken(token)) || (!token && req.session.tokens));
-        res.status(200).send({ status });
+        if (req.session.tokens) {
+            return res.status(200).send({status: true});
+        } else {
+            return res.status(200).send({status: false});
+        }
     } catch (e) {
         console.log(e);
         res.status(500).json({errors: e});

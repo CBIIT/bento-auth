@@ -10,8 +10,6 @@ const config = {
   idp: process.env.IDP ? process.env.IDP.toLowerCase() : GOOGLE.toLowerCase(),
   cookie_secret: process.env.COOKIE_SECRET,
   session_timeout: process.env.SESSION_TIMEOUT ? parseInt(process.env.SESSION_TIMEOUT) * 1000 : 1000 * 30 * 60,  // 30 minutes
-  token_secret: process.env.TOKEN_SECRET,
-  token_timeout: process.env.TOKEN_TIMEOUT ? parseInt(process.env.TOKEN_TIMEOUT) : 30 * 60, // 30 minutes
 
   // Google login settings
   google: {
