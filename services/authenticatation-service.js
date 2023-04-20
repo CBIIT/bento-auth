@@ -6,15 +6,19 @@ class AuthenticationService{
     }
 
     async authenticate(req){
-        if (!req || !req.headers || !req.session || !req.session.userInfo) return false;
-        const token = getTokenFromRequest(req.headers['authorization']);
-        const UUIDArray = await this.userService.getUserTokenUUIDs(req.session.userInfo)
-        return Boolean((token && await this.tokenService.authenticateUserToken(token, UUIDArray)) || (!token && req.session.tokens))
+        const session = req?.session;
+        if (!session) return false;
+        const authHeader = req?.headers?.authorization;
+        if (authHeader) {
+            const token = getTokenFromAuthHeader(authHeader);
+            const UUIDArray = await this.userService.getUserTokenUUIDs(req.session.userInfo);
+            return Boolean(token && await this.tokenService.authenticateUserToken(token, UUIDArray));
+        }
+        return Boolean(req.session.tokens);
     }
 }
 
-function getTokenFromRequest(authHeader) {
-    if (!authHeader) return undefined;
+function getTokenFromAuthHeader(authHeader) {
     const splits = authHeader.split(' ');
     if (splits.length < 2) return "invalid token value";
     return splits[1];

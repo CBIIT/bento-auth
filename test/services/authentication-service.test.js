@@ -61,6 +61,11 @@ describe('authenticate tests', () => {
         let req = {
             session: placeholderSession
         };
+        expect(await authService.authenticate(req)).toBeTruthy();
+        req.headers = null;
+        expect(await authService.authenticate(req)).toBeTruthy();
+        req.session.tokens = null;
+        req.headers = undefined;
         expect(await authService.authenticate(req)).toBeFalsy();
         req.headers = null;
         expect(await authService.authenticate(req)).toBeFalsy();
