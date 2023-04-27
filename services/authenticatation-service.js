@@ -1,20 +1,16 @@
 class AuthenticationService{
 
-    constructor(tokenService, userService){
+    constructor(tokenService){
         this.tokenService = tokenService;
-        this.userService = userService;
     }
 
     async authenticate(req){
-        const session = req?.session;
-        if (!session) return false;
         const authHeader = req?.headers?.authorization;
         if (authHeader) {
             const token = getTokenFromAuthHeader(authHeader);
-            const UUIDArray = await this.userService.getUserTokenUUIDs(req.session.userInfo);
-            return Boolean(token && await this.tokenService.authenticateUserToken(token, UUIDArray));
+            return Boolean(token && await this.tokenService.authenticateUserToken(token));
         }
-        return Boolean(req.session.tokens);
+        return Boolean(req?.session?.tokens);
     }
 }
 

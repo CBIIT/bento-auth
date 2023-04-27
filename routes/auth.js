@@ -14,8 +14,8 @@ const {UserService} = require("../services/user-service");
 const neo4j = new Neo4jDriver(config.neo4j_uri, config.neo4j_user, config.neo4j_password);
 const neo4jService = new Neo4jService(neo4j);
 const eventService = new EventService(neo4j);
-const tokenService = new TokenService(config.token_secret);
 const userService = new UserService(neo4jService);
+const tokenService = new TokenService(config.token_secret, userService);
 const authService = new AuthenticationService(tokenService, userService);
 
 /* Login */
