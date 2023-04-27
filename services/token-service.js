@@ -2,16 +2,17 @@ const jwt = require("jsonwebtoken");
 
 class TokenService {
 
-    constructor(tokenSecret) {
+    constructor(tokenSecret, userService) {
         this.tokenSecret = tokenSecret;
+        this.userService = userService;
     }
 
-    authenticateUserToken (token, UUIDArray) {
+    async authenticateUserToken(token) {
         const isValidToken = verifyToken(token, this.tokenSecret);
-        const userInfo = isValidToken ? decodeToken(token, this.tokenSecret) : {};
-        return (userInfo) && isElementInArrayCaseInsensitive(UUIDArray, userInfo.uuid);
+        const userInfo = isValidToken ? decodeToken(token, this.tokenSecret) : null;
+        const UUIDArray = (userInfo) ? await this.userService.getUserTokenUUIDs(userInfo): [];
+        return UUIDArray.length > 0 && isElementInArrayCaseInsensitive(UUIDArray, userInfo.uuid);
     }
-
 }
 
 function verifyToken(token , tokenSecret) {
