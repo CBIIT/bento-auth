@@ -9,9 +9,24 @@ class TokenService {
 
     async authenticateUserToken(token) {
         const isValidToken = verifyToken(token, this.tokenSecret);
-        const userInfo = isValidToken ? decodeToken(token, this.tokenSecret) : null;
-        const UUIDArray = (userInfo) ? await this.userService.getUserTokenUUIDs(userInfo): [];
-        return UUIDArray.length > 0 && isElementInArrayCaseInsensitive(UUIDArray, userInfo.uuid);
+        let userInfo;
+        if (isValidToken) {
+            userInfo = decodeToken(token, this.tokenSecret);
+        }
+        else{
+            console.warn("Token was invalid");
+        }
+        let UUIDArray = [];
+        if (userInfo){
+            UUIDArray = await this.userService.getUserTokenUUIDs(userInfo)
+        }
+        else {
+            console.warn("User info missing from token")
+        }
+        if (!isElementInArrayCaseInsensitive(UUIDArray, userInfo.uuid)){
+            console.warn("Token not in whitelist for the user")
+            return false;
+        }
     }
 }
 
