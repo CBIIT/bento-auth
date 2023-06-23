@@ -17,7 +17,7 @@ let client = {
         const payload = ticket.getPayload();
         const name = payload.given_name;
         const email = payload.email;
-        return { name, lastName: payload.family_name, tokens, email, idp: GOOGLE};
+        return { name, lastName: payload.family_name ? payload.family_name : '', tokens, email, idp: GOOGLE};
     },
     authenticated: async (tokens) => {
         try {

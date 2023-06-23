@@ -3,10 +3,23 @@ const router = express.Router();
 const idpClient = require('../idps');
 const config = require('../config');
 const {logout} = require('../controllers/auth-api')
-const {storeLoginEvent, storeLogoutEvent} = require("../neo4j/neo4j-operations");
 const {formatVariables, formatMap} = require("../bento-event-logging/const/format-constants");
+const {TokenService} = require("../services/token-service");
+const {AuthenticationService} = require("../services/authenticatation-service");
+const {EventService} = require("../neo4j/event-service");
+const {Neo4jDriver} = require("../neo4j/neo4j");
+const {Neo4jService} = require("../neo4j/neo4j-service");
+const {UserService} = require("../services/user-service");
+//services
+const neo4j = new Neo4jDriver(config.neo4j_uri, config.neo4j_user, config.neo4j_password);
+const neo4jService = new Neo4jService(neo4j);
+const eventService = new EventService(neo4j);
+const userService = new UserService(neo4jService);
+const tokenService = new TokenService(config.token_secret, userService);
+const authService = new AuthenticationService(tokenService, userService);
 
 /* Login */
+/* Granting an authenticated token */
 router.post('/login', async function (req, res) {
     try {
         const reqIDP = config.getIdpOrDefault(req.body['IDP']);
@@ -18,14 +31,14 @@ router.post('/login', async function (req, res) {
             lastName: lastName
         };
         req.session.userInfo = formatVariables(req.session.userInfo, ["IDP"], formatMap);
-        await storeLoginEvent(req.session.userInfo.email, req.session.userInfo.IDP);
+        await eventService.storeLoginEvent(req.session.userInfo.email, req.session.userInfo.IDP);
         req.session.tokens = tokens;
         res.json({name, email, "timeout": config.session_timeout / 1000});
     } catch (e) {
         if (e.code && parseInt(e.code)) {
-            res.status(e.code);
+            res.status(parseInt(e.code));
         } else if (e.statusCode && parseInt(e.statusCode)) {
-            res.status(e.statusCode);
+            res.status(parseInt(e.statusCode));
         } else {
             res.status(500);
         }
@@ -39,7 +52,7 @@ router.post('/logout', async function (req, res, next) {
         const idp = config.getIdpOrDefault(req.body['IDP']);
         await idpClient.logout(idp, req.session.tokens);
         let userInfo = req.session.userInfo;
-        await storeLogoutEvent(userInfo.email, userInfo.IDP);
+        await eventService.storeLogoutEvent(userInfo.email, userInfo.IDP);
         // Remove User Session
         return logout(req, res);
     } catch (e) {
@@ -51,30 +64,14 @@ router.post('/logout', async function (req, res, next) {
 /* Authenticated */
 // Return {status: true} or {status: false}
 // Calling this API will refresh the session
-router.post('/authenticated', async function (req, res, next) {
+router.post('/authenticated', async function (req, res) {
     try {
-        if (req.session.tokens) {
-            return res.status(200).send({status: true});
-        } else {
-            return res.status(200).send({status: false});
-        }
+        const status = await authService.authenticate(req);
+        res.status(200).send({ status });
     } catch (e) {
         console.log(e);
         res.status(500).json({errors: e});
     }
-});
-
-
-/* GET ping-ping for health checking. */
-router.get('/ping', function (req, res, next) {
-    res.send(`pong`);
-});
-
-/* GET version for health checking and version checking. */
-router.get('/version', function (req, res, next) {
-    res.json({
-        version: config.version, date: config.date
-    });
 });
 
 module.exports = router;
