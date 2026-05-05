@@ -2,7 +2,10 @@ public/
 node_modules/
 sessions/
 .idea/
+.vscode/
 logs/
 yaml/
 newrelic_agent.log
 .env
+.DS_Store
+.github/skills/

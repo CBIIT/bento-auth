@@ -1,0 +1,436 @@
+watchman warning:  opendir(/Users/cheny39/Library/Containers/com.microsoft.teams2/Data/Library/Application Support/com.microsoft.teams2/com.microsoft.appcenter) -> Interrupted system call. Marking this portion of the tree deleted
+To clear this warning, run:
+`watchman watch-del '/Users/cheny39' ; watchman watch-project '/Users/cheny39'`
+
+(node:59064) Warning: `--localstorage-file` was provided without a valid path
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:59064) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+FAIL test/api/refresh-endpoint.test.js
+  ● POST /api/auth/refresh › should return 401 when no refresh token is available for implicit session id
+
+    TypeError: Cannot read properties of undefined (reading 'mockResolvedValue')
+
+      48 |
+      49 |     it('should return 401 when no refresh token is available for implicit session id', async () => {
+    > 50 |         mySQLOps.getSessionTokens.mockResolvedValue(null);
+         |                                   ^
+      51 |
+      52 |         const response = await request(app)
+      53 |             .post('/api/auth/refresh')
+
+      at Object.mockResolvedValue (test/api/refresh-endpoint.test.js:50:35)
+
+  ● POST /api/auth/refresh › should return 401 if no refresh token available
+
+    TypeError: Cannot read properties of undefined (reading 'mockResolvedValue')
+
+      59 |
+      60 |     it('should return 401 if no refresh token available', async () => {
+    > 61 |         mySQLOps.getSessionTokens.mockResolvedValue(null);
+         |                                   ^
+      62 |
+      63 |         const response = await request(app)
+      64 |             .post('/api/auth/refresh')
+
+      at Object.mockResolvedValue (test/api/refresh-endpoint.test.js:61:35)
+
+  ● POST /api/auth/refresh › should successfully refresh tokens
+
+    TypeError: Cannot read properties of undefined (reading 'mockResolvedValue')
+
+       96 |         };
+       97 |
+    >  98 |         mySQLOps.getSessionTokens.mockResolvedValue(oldTokens);
+          |                                   ^
+       99 |         refreshRASTokenBundle.mockResolvedValue(newTokens);
+      100 |         rasUserInfo.mockResolvedValue(userInfo);
+      101 |         validateRASPassport.mockResolvedValue(true);
+
+      at Object.mockResolvedValue (test/api/refresh-endpoint.test.js:98:35)
+
+  ● POST /api/auth/refresh › should return 401 if passport validation fails
+
+    TypeError: Cannot read properties of undefined (reading 'mockResolvedValue')
+
+      135 |         };
+      136 |
+    > 137 |         mySQLOps.getSessionTokens.mockResolvedValue(oldTokens);
+          |                                   ^
+      138 |         refreshRASTokenBundle.mockResolvedValue(newTokens);
+      139 |         rasUserInfo.mockResolvedValue(userInfo);
+      140 |         validateRASPassport.mockResolvedValue(false);
+
+      at Object.mockResolvedValue (test/api/refresh-endpoint.test.js:137:35)
+
+  ● POST /api/auth/refresh › should return 500 if database update fails
+
+    TypeError: Cannot read properties of undefined (reading 'mockResolvedValue')
+
+      166 |         };
+      167 |
+    > 168 |         mySQLOps.getSessionTokens.mockResolvedValue(oldTokens);
+          |                                   ^
+      169 |         refreshRASTokenBundle.mockResolvedValue(newTokens);
+      170 |         rasUserInfo.mockResolvedValue(userInfo);
+      171 |         validateRASPassport.mockResolvedValue(true);
+
+      at Object.mockResolvedValue (test/api/refresh-endpoint.test.js:168:35)
+
+  ● POST /api/auth/refresh › should handle RAS API errors gracefully
+
+    TypeError: Cannot read properties of undefined (reading 'mockResolvedValue')
+
+      186 |         };
+      187 |
+    > 188 |         mySQLOps.getSessionTokens.mockResolvedValue(oldTokens);
+          |                                   ^
+      189 |         refreshRASTokenBundle.mockRejectedValue(new Error('RAS service unavailable'));
+      190 |
+      191 |         const response = await request(app)
+
+      at Object.mockResolvedValue (test/api/refresh-endpoint.test.js:188:35)
+
+  ● POST /api/auth/refresh › should use session tokens if available instead of fetching from DB
+
+    TypeError: Cannot read properties of undefined (reading 'mockResolvedValue')
+
+      235 |         rasUserInfo.mockResolvedValue(userInfo);
+      236 |         validateRASPassport.mockResolvedValue(true);
+    > 237 |         mySQLOps.updateSessionTokens.mockResolvedValue(true);
+          |                                      ^
+      238 |
+      239 |         const response = await request(testApp)
+      240 |             .post('/api/auth/refresh')
+
+      at Object.mockResolvedValue (test/api/refresh-endpoint.test.js:237:38)
+
+PASS test/services/authentication-service.test.js
+PASS test/services/refresh-token.test.js
+FAIL test/auth.test.js
+  ● Console
+
+    console.error
+      New Relic for Node.js halted startup due to an error:
+
+      at afterStart (node_modules/newrelic/index.js:162:15)
+      at onNextTick (node_modules/newrelic/lib/agent.js:226:7)
+
+    console.error
+      Error: Not starting without license key!
+          at onNextTick (/Users/cheny39/Documents/work/ctdc/crdc-ctdc-authn/node_modules/newrelic/lib/agent.js:226:16)
+          at processTicksAndRejections (node:internal/process/task_queues:85:11)
+
+      at afterStart (node_modules/newrelic/index.js:163:15)
+      at onNextTick (node_modules/newrelic/lib/agent.js:226:7)
+
+    console.error
+      [winston] Attempt to write logs with no transports, which can increase memory usage: {"message":"[POST] /login - Login attempt with IDP: nih","level":"debug"}
+
+      at DerivedLogger._transform (node_modules/winston/lib/winston/logger.js:326:15)
+      at DerivedLogger.Object.<anonymous>.Transform._read (node_modules/winston/node_modules/readable-stream/lib/_stream_transform.js:166:10)
+      at DerivedLogger.Object.<anonymous>.Transform._write (node_modules/winston/node_modules/readable-stream/lib/_stream_transform.js:155:83)
+      at doWrite (node_modules/winston/node_modules/readable-stream/lib/_stream_writable.js:390:139)
+      at writeOrBuffer (node_modules/winston/node_modules/readable-stream/lib/_stream_writable.js:381:5)
+      at DerivedLogger.Object.<anonymous>.Writable.write (node_modules/winston/node_modules/readable-stream/lib/_stream_writable.js:302:11)
+      at DerivedLogger.<computed> [as debug] (node_modules/winston/lib/winston/create-logger.js:81:14)
+      at Object.exports.<computed> [as debug] (node_modules/winston/lib/winston.js:110:68)
+
+    console.error
+      [winston] Attempt to write logs with no transports, which can increase memory usage: {"message":"Processing login request","level":"info"}
+
+      at DerivedLogger._transform (node_modules/winston/lib/winston/logger.js:326:15)
+      at DerivedLogger.Object.<anonymous>.Transform._read (node_modules/winston/node_modules/readable-stream/lib/_stream_transform.js:166:10)
+      at DerivedLogger.Object.<anonymous>.Transform._write (node_modules/winston/node_modules/readable-stream/lib/_stream_transform.js:155:83)
+      at doWrite (node_modules/winston/node_modules/readable-stream/lib/_stream_writable.js:390:139)
+      at writeOrBuffer (node_modules/winston/node_modules/readable-stream/lib/_stream_writable.js:381:5)
+      at DerivedLogger.Object.<anonymous>.Writable.write (node_modules/winston/node_modules/readable-stream/lib/_stream_writable.js:302:11)
+      at DerivedLogger.<computed> [as info] (node_modules/winston/lib/winston/create-logger.js:81:14)
+      at Object.exports.<computed> [as info] (node_modules/winston/lib/winston.js:110:68)
+
+    console.log
+      Switch to SQL
+
+      at EventService.log [as storeLoginEvent] (neo4j/event-service.js:20:21)
+
+    console.error
+      [winston] Attempt to write logs with no transports, which can increase memory usage: {"message":"Failed to store login event: mySQLOps.getCreateCommand is not a function","level":"error"}
+
+      at DerivedLogger._transform (node_modules/winston/lib/winston/logger.js:326:15)
+      at DerivedLogger.Object.<anonymous>.Transform._read (node_modules/winston/node_modules/readable-stream/lib/_stream_transform.js:166:10)
+      at DerivedLogger.Object.<anonymous>.Transform._write (node_modules/winston/node_modules/readable-stream/lib/_stream_transform.js:155:83)
+      at doWrite (node_modules/winston/node_modules/readable-stream/lib/_stream_writable.js:390:139)
+      at writeOrBuffer (node_modules/winston/node_modules/readable-stream/lib/_stream_writable.js:381:5)
+      at DerivedLogger.Object.<anonymous>.Writable.write (node_modules/winston/node_modules/readable-stream/lib/_stream_writable.js:302:11)
+      at DerivedLogger.<computed> [as error] (node_modules/winston/lib/winston/create-logger.js:81:14)
+      at Object.exports.<computed> [as error] (node_modules/winston/lib/winston.js:110:68)
+
+    console.error
+      [winston] Attempt to write logs with no transports, which can increase memory usage: {"message":"[POST] /api/auth/login - Error 500: getaddrinfo ENOTFOUND crdc-dev-ctdc-rds.cafzefzu2kuj.us-east-1.rds.amazonaws.com","level":"error"}
+
+      at DerivedLogger._transform (node_modules/winston/lib/winston/logger.js:326:15)
+      at DerivedLogger.Object.<anonymous>.Transform._read (node_modules/winston/node_modules/readable-stream/lib/_stream_transform.js:166:10)
+      at DerivedLogger.Object.<anonymous>.Transform._write (node_modules/winston/node_modules/readable-stream/lib/_stream_transform.js:155:83)
+      at doWrite (node_modules/winston/node_modules/readable-stream/lib/_stream_writable.js:390:139)
+      at writeOrBuffer (node_modules/winston/node_modules/readable-stream/lib/_stream_writable.js:381:5)
+      at DerivedLogger.Object.<anonymous>.Writable.write (node_modules/winston/node_modules/readable-stream/lib/_stream_writable.js:302:11)
+      at DerivedLogger.<computed> [as error] (node_modules/winston/lib/winston/create-logger.js:81:14)
+      at Object.exports.<computed> [as error] (node_modules/winston/lib/winston.js:110:68)
+
+    console.error
+      [winston] Attempt to write logs with no transports, which can increase memory usage: {"message":"[POST] /login - Login attempt with IDP: google","level":"debug"}
+
+      at DerivedLogger._transform (node_modules/winston/lib/winston/logger.js:326:15)
+      at DerivedLogger.Object.<anonymous>.Transform._read (node_modules/winston/node_modules/readable-stream/lib/_stream_transform.js:166:10)
+      at DerivedLogger.Object.<anonymous>.Transform._write (node_modules/winston/node_modules/readable-stream/lib/_stream_transform.js:155:83)
+      at doWrite (node_modules/winston/node_modules/readable-stream/lib/_stream_writable.js:390:139)
+      at writeOrBuffer (node_modules/winston/node_modules/readable-stream/lib/_stream_writable.js:381:5)
+      at DerivedLogger.Object.<anonymous>.Writable.write (node_modules/winston/node_modules/readable-stream/lib/_stream_writable.js:302:11)
+      at DerivedLogger.<computed> [as debug] (node_modules/winston/lib/winston/create-logger.js:81:14)
+      at Object.exports.<computed> [as debug] (node_modules/winston/lib/winston.js:110:68)
+
+    console.error
+      [winston] Attempt to write logs with no transports, which can increase memory usage: {"message":"Processing login request","level":"info"}
+
+      at DerivedLogger._transform (node_modules/winston/lib/winston/logger.js:326:15)
+      at DerivedLogger.Object.<anonymous>.Transform._read (node_modules/winston/node_modules/readable-stream/lib/_stream_transform.js:166:10)
+      at DerivedLogger.Object.<anonymous>.Transform._write (node_modules/winston/node_modules/readable-stream/lib/_stream_transform.js:155:83)
+      at doWrite (node_modules/winston/node_modules/readable-stream/lib/_stream_writable.js:390:139)
+      at writeOrBuffer (node_modules/winston/node_modules/readable-stream/lib/_stream_writable.js:381:5)
+      at DerivedLogger.Object.<anonymous>.Writable.write (node_modules/winston/node_modules/readable-stream/lib/_stream_writable.js:302:11)
+      at DerivedLogger.<computed> [as info] (node_modules/winston/lib/winston/create-logger.js:81:14)
+      at Object.exports.<computed> [as info] (node_modules/winston/lib/winston.js:110:68)
+
+    console.log
+      Switch to SQL
+
+      at EventService.log [as storeLoginEvent] (neo4j/event-service.js:20:21)
+
+    console.error
+      [winston] Attempt to write logs with no transports, which can increase memory usage: {"message":"Failed to store login event: mySQLOps.getCreateCommand is not a function","level":"error"}
+
+      at DerivedLogger._transform (node_modules/winston/lib/winston/logger.js:326:15)
+      at DerivedLogger.Object.<anonymous>.Transform._read (node_modules/winston/node_modules/readable-stream/lib/_stream_transform.js:166:10)
+      at DerivedLogger.Object.<anonymous>.Transform._write (node_modules/winston/node_modules/readable-stream/lib/_stream_transform.js:155:83)
+      at doWrite (node_modules/winston/node_modules/readable-stream/lib/_stream_writable.js:390:139)
+      at writeOrBuffer (node_modules/winston/node_modules/readable-stream/lib/_stream_writable.js:381:5)
+      at DerivedLogger.Object.<anonymous>.Writable.write (node_modules/winston/node_modules/readable-stream/lib/_stream_writable.js:302:11)
+      at DerivedLogger.<computed> [as error] (node_modules/winston/lib/winston/create-logger.js:81:14)
+      at Object.exports.<computed> [as error] (node_modules/winston/lib/winston.js:110:68)
+
+    console.error
+      [winston] Attempt to write logs with no transports, which can increase memory usage: {"message":"[POST] /api/auth/login - Error 500: getaddrinfo ENOTFOUND crdc-dev-ctdc-rds.cafzefzu2kuj.us-east-1.rds.amazonaws.com","level":"error"}
+
+      at DerivedLogger._transform (node_modules/winston/lib/winston/logger.js:326:15)
+      at DerivedLogger.Object.<anonymous>.Transform._read (node_modules/winston/node_modules/readable-stream/lib/_stream_transform.js:166:10)
+      at DerivedLogger.Object.<anonymous>.Transform._write (node_modules/winston/node_modules/readable-stream/lib/_stream_transform.js:155:83)
+      at doWrite (node_modules/winston/node_modules/readable-stream/lib/_stream_writable.js:390:139)
+      at writeOrBuffer (node_modules/winston/node_modules/readable-stream/lib/_stream_writable.js:381:5)
+      at DerivedLogger.Object.<anonymous>.Writable.write (node_modules/winston/node_modules/readable-stream/lib/_stream_writable.js:302:11)
+      at DerivedLogger.<computed> [as error] (node_modules/winston/lib/winston/create-logger.js:81:14)
+      at Object.exports.<computed> [as error] (node_modules/winston/lib/winston.js:110:68)
+
+    console.error
+      [winston] Attempt to write logs with no transports, which can increase memory usage: {"message":"[POST] /login - Login attempt with IDP: login.gov","level":"debug"}
+
+      at DerivedLogger._transform (node_modules/winston/lib/winston/logger.js:326:15)
+      at DerivedLogger.Object.<anonymous>.Transform._read (node_modules/winston/node_modules/readable-stream/lib/_stream_transform.js:166:10)
+      at DerivedLogger.Object.<anonymous>.Transform._write (node_modules/winston/node_modules/readable-stream/lib/_stream_transform.js:155:83)
+      at doWrite (node_modules/winston/node_modules/readable-stream/lib/_stream_writable.js:390:139)
+      at writeOrBuffer (node_modules/winston/node_modules/readable-stream/lib/_stream_writable.js:381:5)
+      at DerivedLogger.Object.<anonymous>.Writable.write (node_modules/winston/node_modules/readable-stream/lib/_stream_writable.js:302:11)
+      at DerivedLogger.<computed> [as debug] (node_modules/winston/lib/winston/create-logger.js:81:14)
+      at Object.exports.<computed> [as debug] (node_modules/winston/lib/winston.js:110:68)
+
+    console.error
+      [winston] Attempt to write logs with no transports, which can increase memory usage: {"message":"Processing login request","level":"info"}
+
+      at DerivedLogger._transform (node_modules/winston/lib/winston/logger.js:326:15)
+      at DerivedLogger.Object.<anonymous>.Transform._read (node_modules/winston/node_modules/readable-stream/lib/_stream_transform.js:166:10)
+      at DerivedLogger.Object.<anonymous>.Transform._write (node_modules/winston/node_modules/readable-stream/lib/_stream_transform.js:155:83)
+      at doWrite (node_modules/winston/node_modules/readable-stream/lib/_stream_writable.js:390:139)
+      at writeOrBuffer (node_modules/winston/node_modules/readable-stream/lib/_stream_writable.js:381:5)
+      at DerivedLogger.Object.<anonymous>.Writable.write (node_modules/winston/node_modules/readable-stream/lib/_stream_writable.js:302:11)
+      at DerivedLogger.<computed> [as info] (node_modules/winston/lib/winston/create-logger.js:81:14)
+      at Object.exports.<computed> [as info] (node_modules/winston/lib/winston.js:110:68)
+
+    console.log
+      Switch to SQL
+
+      at EventService.log [as storeLoginEvent] (neo4j/event-service.js:20:21)
+
+    console.error
+      [winston] Attempt to write logs with no transports, which can increase memory usage: {"message":"Failed to store login event: mySQLOps.getCreateCommand is not a function","level":"error"}
+
+      at DerivedLogger._transform (node_modules/winston/lib/winston/logger.js:326:15)
+      at DerivedLogger.Object.<anonymous>.Transform._read (node_modules/winston/node_modules/readable-stream/lib/_stream_transform.js:166:10)
+      at DerivedLogger.Object.<anonymous>.Transform._write (node_modules/winston/node_modules/readable-stream/lib/_stream_transform.js:155:83)
+      at doWrite (node_modules/winston/node_modules/readable-stream/lib/_stream_writable.js:390:139)
+      at writeOrBuffer (node_modules/winston/node_modules/readable-stream/lib/_stream_writable.js:381:5)
+      at DerivedLogger.Object.<anonymous>.Writable.write (node_modules/winston/node_modules/readable-stream/lib/_stream_writable.js:302:11)
+      at DerivedLogger.<computed> [as error] (node_modules/winston/lib/winston/create-logger.js:81:14)
+      at Object.exports.<computed> [as error] (node_modules/winston/lib/winston.js:110:68)
+
+    console.error
+      [winston] Attempt to write logs with no transports, which can increase memory usage: {"message":"[POST] /api/auth/login - Error 500: getaddrinfo ENOTFOUND crdc-dev-ctdc-rds.cafzefzu2kuj.us-east-1.rds.amazonaws.com","level":"error"}
+
+      at DerivedLogger._transform (node_modules/winston/lib/winston/logger.js:326:15)
+      at DerivedLogger.Object.<anonymous>.Transform._read (node_modules/winston/node_modules/readable-stream/lib/_stream_transform.js:166:10)
+      at DerivedLogger.Object.<anonymous>.Transform._write (node_modules/winston/node_modules/readable-stream/lib/_stream_transform.js:155:83)
+      at doWrite (node_modules/winston/node_modules/readable-stream/lib/_stream_writable.js:390:139)
+      at writeOrBuffer (node_modules/winston/node_modules/readable-stream/lib/_stream_writable.js:381:5)
+      at DerivedLogger.Object.<anonymous>.Writable.write (node_modules/winston/node_modules/readable-stream/lib/_stream_writable.js:302:11)
+      at DerivedLogger.<computed> [as error] (node_modules/winston/lib/winston/create-logger.js:81:14)
+      at Object.exports.<computed> [as error] (node_modules/winston/lib/winston.js:110:68)
+
+    console.error
+      [winston] Attempt to write logs with no transports, which can increase memory usage: {"message":"[POST] /logout - Logout attempt with IDP: nih","level":"debug"}
+
+      at DerivedLogger._transform (node_modules/winston/lib/winston/logger.js:326:15)
+      at DerivedLogger.Object.<anonymous>.Transform._read (node_modules/winston/node_modules/readable-stream/lib/_stream_transform.js:166:10)
+      at DerivedLogger.Object.<anonymous>.Transform._write (node_modules/winston/node_modules/readable-stream/lib/_stream_transform.js:155:83)
+      at doWrite (node_modules/winston/node_modules/readable-stream/lib/_stream_writable.js:390:139)
+      at writeOrBuffer (node_modules/winston/node_modules/readable-stream/lib/_stream_writable.js:381:5)
+      at DerivedLogger.Object.<anonymous>.Writable.write (node_modules/winston/node_modules/readable-stream/lib/_stream_writable.js:302:11)
+      at DerivedLogger.<computed> [as debug] (node_modules/winston/lib/winston/create-logger.js:81:14)
+      at Object.exports.<computed> [as debug] (node_modules/winston/lib/winston.js:110:68)
+
+    console.error
+      [winston] Attempt to write logs with no transports, which can increase memory usage: {"message":"Processing logout request","level":"info"}
+
+      at DerivedLogger._transform (node_modules/winston/lib/winston/logger.js:326:15)
+      at DerivedLogger.Object.<anonymous>.Transform._read (node_modules/winston/node_modules/readable-stream/lib/_stream_transform.js:166:10)
+      at DerivedLogger.Object.<anonymous>.Transform._write (node_modules/winston/node_modules/readable-stream/lib/_stream_transform.js:155:83)
+      at doWrite (node_modules/winston/node_modules/readable-stream/lib/_stream_writable.js:390:139)
+      at writeOrBuffer (node_modules/winston/node_modules/readable-stream/lib/_stream_writable.js:381:5)
+      at DerivedLogger.Object.<anonymous>.Writable.write (node_modules/winston/node_modules/readable-stream/lib/_stream_writable.js:302:11)
+      at DerivedLogger.<computed> [as info] (node_modules/winston/lib/winston/create-logger.js:81:14)
+      at Object.exports.<computed> [as info] (node_modules/winston/lib/winston.js:110:68)
+
+    console.error
+      [winston] Attempt to write logs with no transports, which can increase memory usage: {"message":"Logout: userInfo not found in session","level":"warn"}
+
+      at DerivedLogger._transform (node_modules/winston/lib/winston/logger.js:326:15)
+      at DerivedLogger.Object.<anonymous>.Transform._read (node_modules/winston/node_modules/readable-stream/lib/_stream_transform.js:166:10)
+      at DerivedLogger.Object.<anonymous>.Transform._write (node_modules/winston/node_modules/readable-stream/lib/_stream_transform.js:155:83)
+      at doWrite (node_modules/winston/node_modules/readable-stream/lib/_stream_writable.js:390:139)
+      at writeOrBuffer (node_modules/winston/node_modules/readable-stream/lib/_stream_writable.js:381:5)
+      at DerivedLogger.Object.<anonymous>.Writable.write (node_modules/winston/node_modules/readable-stream/lib/_stream_writable.js:302:11)
+      at DerivedLogger.<computed> [as warn] (node_modules/winston/lib/winston/create-logger.js:81:14)
+      at Object.exports.<computed> [as warn] (node_modules/winston/lib/winston.js:110:68)
+
+    console.error
+      [winston] Attempt to write logs with no transports, which can increase memory usage: {"message":"Destroying user session on logout","level":"debug"}
+
+      at DerivedLogger._transform (node_modules/winston/lib/winston/logger.js:326:15)
+      at DerivedLogger.Object.<anonymous>.Transform._read (node_modules/winston/node_modules/readable-stream/lib/_stream_transform.js:166:10)
+      at DerivedLogger.Object.<anonymous>.Transform._write (node_modules/winston/node_modules/readable-stream/lib/_stream_transform.js:155:83)
+      at doWrite (node_modules/winston/node_modules/readable-stream/lib/_stream_writable.js:390:139)
+      at writeOrBuffer (node_modules/winston/node_modules/readable-stream/lib/_stream_writable.js:381:5)
+      at DerivedLogger.Object.<anonymous>.Writable.write (node_modules/winston/node_modules/readable-stream/lib/_stream_writable.js:302:11)
+      at DerivedLogger.<computed> [as debug] (node_modules/winston/lib/winston/create-logger.js:81:14)
+      at Object.exports.<computed> [as debug] (node_modules/winston/lib/winston.js:110:68)
+
+    console.error
+      [winston] Attempt to write logs with no transports, which can increase memory usage: {"message":"Session destruction failed: getaddrinfo ENOTFOUND crdc-dev-ctdc-rds.cafzefzu2kuj.us-east-1.rds.amazonaws.com","level":"error"}
+
+      at DerivedLogger._transform (node_modules/winston/lib/winston/logger.js:326:15)
+      at DerivedLogger.Object.<anonymous>.Transform._read (node_modules/winston/node_modules/readable-stream/lib/_stream_transform.js:166:10)
+      at DerivedLogger.Object.<anonymous>.Transform._write (node_modules/winston/node_modules/readable-stream/lib/_stream_transform.js:155:83)
+      at doWrite (node_modules/winston/node_modules/readable-stream/lib/_stream_writable.js:390:139)
+      at writeOrBuffer (node_modules/winston/node_modules/readable-stream/lib/_stream_writable.js:381:5)
+      at DerivedLogger.Object.<anonymous>.Writable.write (node_modules/winston/node_modules/readable-stream/lib/_stream_writable.js:302:11)
+      at DerivedLogger.<computed> [as error] (node_modules/winston/lib/winston/create-logger.js:81:14)
+      at Object.exports.<computed> [as error] (node_modules/winston/lib/winston.js:110:68)
+
+    console.log
+      Switch to SQL
+
+      at EventService.log [as storeLoginEvent] (neo4j/event-service.js:20:21)
+
+  ● GET /auth test › auth logout nih
+
+    expected 200 "OK", got 500 "Internal Server Error"
+
+      61 |             .post(LOGOUT_ROUTE)
+      62 |             .send({IDP: NIH})
+    > 63 |             .expect(200);
+         |              ^
+      64 |         expect(nihClient.logout).toBeCalledTimes(1);
+      65 |     });
+      66 |
+
+      at Object.expect (test/auth.test.js:63:14)
+      ----
+      at Test._assertStatus (node_modules/supertest/lib/test.js:252:14)
+      at node_modules/supertest/lib/test.js:308:13
+      at Test._assertFunction (node_modules/supertest/lib/test.js:285:13)
+      at Test.assert (node_modules/supertest/lib/test.js:164:23)
+      at Server.localAssert (node_modules/supertest/lib/test.js:120:14)
+      at Server.wrappedEmit [as emit] (node_modules/newrelic/lib/instrumentation/core/http.js:500:21)
+
+  ● GET /auth test › auth logout login.gov
+
+    expected 200 "OK", got 500 "Internal Server Error"
+
+      71 |             .post(LOGOUT_ROUTE)
+      72 |             .send({IDP: LOGIN_GOV})
+    > 73 |             .expect(200);
+         |              ^
+      74 |         expect(nihClient.logout).toBeCalledTimes(1);
+      75 |     });
+      76 |
+
+      at Object.expect (test/auth.test.js:73:14)
+      ----
+      at Test._assertStatus (node_modules/supertest/lib/test.js:252:14)
+      at node_modules/supertest/lib/test.js:308:13
+      at Test._assertFunction (node_modules/supertest/lib/test.js:285:13)
+      at Test.assert (node_modules/supertest/lib/test.js:164:23)
+      at Server.localAssert (node_modules/supertest/lib/test.js:120:14)
+      at Server.wrappedEmit [as emit] (node_modules/newrelic/lib/instrumentation/core/http.js:500:21)
+
+PASS test/services/ras-auth.test.js
+PASS test/services/ras-idp.test.js
+  ● Console
+
+    console.error
+      [winston] Attempt to write logs with no transports, which can increase memory usage: {"message":"RAS login attempt","level":"debug"}
+
+      at DerivedLogger._transform (node_modules/winston/lib/winston/logger.js:326:15)
+      at DerivedLogger.Object.<anonymous>.Transform._read (node_modules/winston/node_modules/readable-stream/lib/_stream_transform.js:166:10)
+      at DerivedLogger.Object.<anonymous>.Transform._write (node_modules/winston/node_modules/readable-stream/lib/_stream_transform.js:155:83)
+      at doWrite (node_modules/winston/node_modules/readable-stream/lib/_stream_writable.js:390:139)
+      at writeOrBuffer (node_modules/winston/node_modules/readable-stream/lib/_stream_writable.js:381:5)
+      at DerivedLogger.Object.<anonymous>.Writable.write (node_modules/winston/node_modules/readable-stream/lib/_stream_writable.js:302:11)
+      at DerivedLogger.<computed> [as debug] (node_modules/winston/lib/winston/create-logger.js:81:14)
+      at Object.exports.<computed> [as debug] (node_modules/winston/lib/winston.js:110:68)
+
+    console.error
+      [winston] Attempt to write logs with no transports, which can increase memory usage: {"message":"RAS login successful for user: u@example.org","level":"info"}
+
+      at DerivedLogger._transform (node_modules/winston/lib/winston/logger.js:326:15)
+      at DerivedLogger.Object.<anonymous>.Transform._read (node_modules/winston/node_modules/readable-stream/lib/_stream_transform.js:166:10)
+      at DerivedLogger.Object.<anonymous>.Transform._write (node_modules/winston/node_modules/readable-stream/lib/_stream_transform.js:155:83)
+      at doWrite (node_modules/winston/node_modules/readable-stream/lib/_stream_writable.js:390:139)
+      at writeOrBuffer (node_modules/winston/node_modules/readable-stream/lib/_stream_writable.js:381:5)
+      at DerivedLogger.Object.<anonymous>.Writable.write (node_modules/winston/node_modules/readable-stream/lib/_stream_writable.js:302:11)
+      at DerivedLogger.<computed> [as info] (node_modules/winston/lib/winston/create-logger.js:81:14)
+      at Object.exports.<computed> [as info] (node_modules/winston/lib/winston.js:110:68)
+
+/Users/cheny39/Documents/work/ctdc/crdc-ctdc-authn/services/token-service.js:10
+    const UUIDArray = userInfo ? await this.userService.getUserTokenUUIDs(userInfo) : [];
+                                                        ^
+
+TypeError: Cannot read properties of undefined (reading 'getUserTokenUUIDs')
+    at TokenService.authenticateUserToken (/Users/cheny39/Documents/work/ctdc/crdc-ctdc-authn/services/token-service.js:10:57)
+    at Object.authenticateUserToken (/Users/cheny39/Documents/work/ctdc/crdc-ctdc-authn/test/services/token-service.test.js:31:29)
+    at Promise.then.completed (/Users/cheny39/Documents/work/ctdc/crdc-ctdc-authn/node_modules/jest-circus/build/utils.js:333:28)
+    at new Promise (<anonymous>)
+    at callAsyncCircusFn (/Users/cheny39/Documents/work/ctdc/crdc-ctdc-authn/node_modules/jest-circus/build/utils.js:259:10)
+    at _callCircusTest (/Users/cheny39/Documents/work/ctdc/crdc-ctdc-authn/node_modules/jest-circus/build/run.js:277:40)
+    at _runTest (/Users/cheny39/Documents/work/ctdc/crdc-ctdc-authn/node_modules/jest-circus/build/run.js:209:3)
+    at _runTestsForDescribeBlock (/Users/cheny39/Documents/work/ctdc/crdc-ctdc-authn/node_modules/jest-circus/build/run.js:97:9)
+    at _runTestsForDescribeBlock (/Users/cheny39/Documents/work/ctdc/crdc-ctdc-authn/node_modules/jest-circus/build/run.js:91:9)
+    at run (/Users/cheny39/Documents/work/ctdc/crdc-ctdc-authn/node_modules/jest-circus/build/run.js:31:3)
+
+Node.js v25.4.0

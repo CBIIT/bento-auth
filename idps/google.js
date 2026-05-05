@@ -1,9 +1,11 @@
 const { google } = require('googleapis');
+const logger = require('winston');
 const config = require('../config');
 const {GOOGLE} = require("../constants/idp-constants");
 
 let client = {
     login: async (code, redirectURL) => {
+        logger.debug('Google login attempt');
         this.oauth2Client = new google.auth.OAuth2(
             config.google.CLIENT_ID,
             config.google.CLIENT_SECRET,
@@ -27,14 +29,15 @@ let client = {
                     audience: config.google.CLIENT_ID
                 });
                 const payload = ticket.getPayload();
+                logger.debug('Google token validated successfully');
                 return true;
             } else {
-                console.log('No tokens found!');
+                logger.warn('Google authentication check: no tokens found');
                 return false;
             }
 
         } catch (e) {
-           console.log(e);
+           logger.error(`Google token validation failed: ${e.message}`);
            return false;
         }
     }

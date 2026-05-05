@@ -33,6 +33,50 @@ const config = {
     PROMPT: process.env.NIH_PROMPT
   },
 
+    // Fence login settings
+  Fence: {
+    CLIENT_ID: process.env.NIH_CLIENT_ID,
+    CLIENT_SECRET: process.env.NIH_CLIENT_SECRET,
+    BASE_URL: process.env.NIH_BASE_URL,
+    REDIRECT_URL: process.env.NIH_REDIRECT_URL,
+    USERINFO_URL: process.env.NIH_USERINFO_URL,
+    AUTHORIZE_URL: process.env.NIH_AUTHORIZE_URL,
+    TOKEN_URL: process.env.NIH_TOKEN_URL,
+    LOGOUT_URL: process.env.NIH_LOGOUT_URL,
+    SCOPE: process.env.NIH_SCOPE,
+    PROMPT: process.env.NIH_PROMPT
+  },
+
+  // DCF/Fence login settings
+  DCF: {
+    CLIENT_ID: process.env.DCF_CLIENT_ID,
+    CLIENT_SECRET: process.env.DCF_CLIENT_SECRET,
+    BASE_URL: process.env.DCF_BASE_URL,
+    REDIRECT_URL: process.env.DCF_REDIRECT_URL,
+    USERINFO_URL: process.env.DCF_USERINFO_URL,
+    AUTHORIZE_URL: process.env.DCF_AUTHORIZE_URL,
+    TOKEN_URL: process.env.DCF_TOKEN_URL,
+    LOGOUT_URL: process.env.DCF_LOGOUT_URL,
+    SCOPE: process.env.DCF_SCOPE,
+    PROMPT: process.env.DCF_PROMPT
+  },
+
+  // RAS login settings
+  ras: {
+    CLIENT_ID: process.env.RAS_CLIENT_ID,
+    CLIENT_SECRET: process.env.RAS_CLIENT_SECRET,
+    BASE_URL: process.env.RAS_BASE_URL,
+    REDIRECT_URL: process.env.RAS_REDIRECT_URL,
+    USERINFO_URL: process.env.RAS_USERINFO_URL,
+    AUTHORIZE_URL: process.env.RAS_AUTHORIZE_URL,
+    TOKEN_URL: process.env.RAS_TOKEN_URL,
+    LOGOUT_URL: process.env.RAS_LOGOUT_URL,
+    VALIDATE_URL: process.env.RAS_VALIDATE_URL,
+    SCOPE: process.env.RAS_SCOPE,
+    PROMPT: process.env.RAS_PROMPT
+  },
+
+  database_type: process.env.DATABASE_TYPE,
   // Neo4j Connection
   neo4j_uri: process.env.NEO4J_URI,
   neo4j_user: process.env.NEO4J_USER,
@@ -55,6 +99,7 @@ const config = {
     // if (url) return url;
     if (!url && isCaseInsensitiveEqual(idp,'GOOGLE')) return process.env.GOOGLE_REDIRECT_URL;
     if (!url && isCaseInsensitiveEqual(idp,'NIH')) return process.env.NIH_REDIRECT_URL;
+    if (!url && isCaseInsensitiveEqual(idp,'RAS')) return process.env.RAS_REDIRECT_URL;
     return url;
   }
 };

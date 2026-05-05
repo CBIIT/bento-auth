@@ -1,20 +1,33 @@
 const googleClient = require('./google');
 const nihClient = require('./nih');
+const dcfClient = require('./dcf');
+const rasClient = require('./ras');
 const testIDP = require('./testIDP');
 const {isCaseInsensitiveEqual} = require("../util/string-util");
-const {NIH, GOOGLE, LOGIN_GOV, TEST} = require("../constants/idp-constants");
+const {NIH, GOOGLE, LOGIN_GOV, TEST, DCF, RAS} = require("../constants/idp-constants");
 
 const oauth2Client = {
     login: async (code, idp, redirectingURL) => {
-        // if google
-        if (isCaseInsensitiveEqual(idp, GOOGLE)) {
+        switch (true) {
+          case isCaseInsensitiveEqual(idp, GOOGLE):
             return googleClient.login(code, redirectingURL);
-        } else if (isCaseInsensitiveEqual(idp,NIH) || isCaseInsensitiveEqual(idp, LOGIN_GOV)) {
+
+          case isCaseInsensitiveEqual(idp,NIH):
             return nihClient.login(code, redirectingURL);
-        }
-        else if (isCaseInsensitiveEqual(idp,TEST) && process.env.NODE_ENV === 'development') {
+
+          case isCaseInsensitiveEqual(idp, LOGIN_GOV):
+            return nihClient.login(code, redirectingURL);
+
+         case isCaseInsensitiveEqual(idp, DCF):
+            return dcfClient.login(code, redirectingURL);
+
+          case isCaseInsensitiveEqual(idp, RAS):
+            return rasClient.login(code, redirectingURL);
+         
+          default:
             return testIDP.login(code);
         }
+    
     },
     authenticated: async (userSession, tokens, fileAcl) => {
         // Check Valid Token
@@ -22,6 +35,8 @@ const oauth2Client = {
             return await googleClient.authenticated(tokens);
         } else if (isCaseInsensitiveEqual(userSession.idp,NIH)) {
             return await nihClient.authenticated(tokens);
+        } else if (isCaseInsensitiveEqual(userSession.idp,RAS)) {
+          return await rasClient.authenticated(tokens);
         }
         return false;
     },

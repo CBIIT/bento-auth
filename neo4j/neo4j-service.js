@@ -7,7 +7,7 @@ class Neo4jService {
 
     async getUserTokenUUIDs(parameters) {
         const cypher =
-            `
+        `
         MATCH (user:User)
         WHERE user.email = $email AND user.IDP = $IDP
         OPTIONAL MATCH (user)<-[:of_token]-(token:Token)

@@ -1,5 +1,6 @@
 const { createTransport } = require('nodemailer');
 const config = require('../config');
+const logger = require('winston');
 
 async function sendNotification(from, subject, html, to = [], cc = [], bcc = []) {
 
@@ -20,20 +21,20 @@ async function sendNotification(from, subject, html, to = [], cc = [], bcc = [])
 
 async function sendMail(params) {
     const transport = createTransport(config.email_transport);
-    console.log("Generating email to: "+params.to.join(', '));
+    logger.debug(`Generating email to: ${params.to.join(', ')}`);
     if (config.emails_enabled){
         try{
             let result = await transport.sendMail(params);
-            console.log("Email sent");
+            logger.info(`Email sent successfully to: ${params.to.join(', ')}`);
             return result;
         }
         catch (err){
-            console.error("Email failed to send with ths following reason:" + err.message);
+            logger.error(`Email failed to send: ${err.message}`);
             return err;
         }
     }
     else {
-        console.log("Email not sent, email is disabled by configuration");
+        logger.warn('Email not sent: emails are disabled by configuration');
         return true;
     }
 }

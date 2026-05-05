@@ -8,26 +8,29 @@ on:
       environment:
         description: 'Which account the ECR repository is in'
         type: environment
-      ignore_trivy_scan:
+      fail_on_trivy_scan:
         type: boolean
-        description: ignore vulnerabilities if they are found
+        description: fail the build if vulnerabilities are found
         required: true 
-        default: false
+        default: true
+
 jobs:
   build:
     name: Build Image
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
     env:
-        ECR_REPOSITORY: bento-auth
+        ECR_REPOSITORY: crdc-ctdc-authn
         SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         AWS_ROLE_TO_ASSUME: ${{ secrets.AWS_ROLE_TO_ASSUME }}
         AWS_REGION: ${{ secrets.AWS_REGION }}
-        
+    
     steps:
 
     - name: Check out code
-      uses: actions/checkout@ee0669bd1cc54295c223e0bb666b733df41de1c5     # v2.7.0
+      uses: actions/checkout@ee0669bd1cc54295c223e0bb666b733df41de1c5
+      with:
+        submodules: 'recursive'
 
     - name: Set Image Tag
       env:
@@ -35,36 +38,36 @@ jobs:
       run: |
         # Get all tags for the repo and find the latest tag for the branch being built
         git fetch --tags --force --quiet
-        tag=$(git tag -l $BRANCH_NAME* | sort -V | tail -1)
+        tag=$(git tag -l $BRANCH_NAME* | tail -1)
         if  [ ! -z "$tag" ];
         then
           # Increment the build number if a tag is found
           build_num=$(echo "${tag##*.}")
           build_num=$((build_num+1))
-          echo "IMAGE_TAG=$BRANCH_NAME.$build_num" >> $GITHUB_ENV
+          echo "IMAGE_TAG=$GITHUB_REF_NAME.$build_num" >> $GITHUB_ENV
         else
           # If no tag is found create a new tag name
           build_num=1
-          echo "IMAGE_TAG=$BRANCH_NAME.$build_num" >> $GITHUB_ENV
+          echo "IMAGE_TAG=$GITHUB_REF_NAME.$build_num" >> $GITHUB_ENV
         fi
-    
+        
     - name: Build
       id: build-image
       run: |
         docker build -t $ECR_REPOSITORY:$IMAGE_TAG .
-        
+
     - name: Set Trivy exit code
       run: |
-        if  [[ ${{ inputs.ignore_trivy_scan }} == true ]];
+        if  [[ ${{ inputs.fail_on_trivy_scan }} == true ]];
         then
-          echo 'TRIVY_EXIT_CODE=0' >> $GITHUB_ENV
-        else
           echo 'TRIVY_EXIT_CODE=1' >> $GITHUB_ENV
+        else
+          echo 'TRIVY_EXIT_CODE=0' >> $GITHUB_ENV
         fi
-    
+
     - name: Run Trivy vulnerability scanner
       id: trivy-scan
-      uses: aquasecurity/trivy-action@6c175e9c4083a92bbca2f9724c8a5e33bc2d97a5     # v0.30.0
+      uses: aquasecurity/trivy-action@b2933f565dbc598b29947660e66259e3c7bc8561
       with:
         image-ref: '${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}'
         format: 'table'
@@ -73,7 +76,7 @@ jobs:
         severity: 'CRITICAL,HIGH'
 
     - name: AWS OIDC Authentication
-      uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502     # v4.0.2
+      uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502
       with:
         role-to-assume: ${{ env.AWS_ROLE_TO_ASSUME }}
         aws-region: ${{ env.AWS_REGION }}
@@ -88,7 +91,7 @@ jobs:
 
     - name: Login to Amazon ECR
       id: login-aws-ecr
-      uses: aws-actions/amazon-ecr-login@062b18b96a7aff071d4dc91bc00c4c1a7945b076     # v2.0.1
+      uses: aws-actions/amazon-ecr-login@5a88a04c91d5c6f97aae0d9be790e64d9b1d47b7
     
     - name: Push to Amazon ECR
       id: push-image
@@ -99,7 +102,7 @@ jobs:
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
     - name: Slack Notification
-      uses: act10ns/slack@87c73aef9f8838eb6feae81589a6b1487a4a9e08     # v1.6.0
+      uses: act10ns/slack@87c73aef9f8838eb6feae81589a6b1487a4a9e08
       with:
         status: ${{ job.status }}
         steps: ${{ toJson(steps) }}
